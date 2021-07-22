@@ -41,6 +41,7 @@ export default {
 
 <style scoped lang="scss">
 .el-menu-vertical-demo {
+  text-align: center;
   height: 100vh;
   i {
     color: #fff;
