@@ -20,35 +20,43 @@
       </el-form-item>
 
       <el-form-item label="身份证号码：" prop="IDCard" class="small">
-        <el-input v-model="ruleForm.IDCard"></el-input>
+        <el-input v-model="ruleForm.IDCard" type="number"></el-input>
       </el-form-item>
 
       <el-form-item label="手机号码：" prop="phone" class="small">
-        <el-input v-model="ruleForm.phone"></el-input>
+        <el-input v-model="ruleForm.phone" type="number"></el-input>
       </el-form-item>
 
       <el-form-item label="座机号码：" prop="landline" class="small">
-        <el-input v-model="ruleForm.landline"></el-input>
+        <el-input v-model="ruleForm.landline" type="number"></el-input>
       </el-form-item>
 
       <el-form-item label="邮箱：" prop="email" class="small">
-        <el-input v-model="ruleForm.email"></el-input>
+        <el-input v-model="ruleForm.email" type="email"></el-input>
       </el-form-item>
 
       <el-form-item label="出生年月：" prop="birthDate">
-        <el-date-picker v-model="ruleForm.dateBirth" :picker-options="pickerOptions0" type="date" format="yyyy 年 MM 月 dd 日" placeholder="选择日期">
+        <el-date-picker v-model="ruleForm.birthDate" :picker-options="pickerOptions0" type="date" format="yyyy 年 MM 月 dd 日" placeholder="选择日期">
         </el-date-picker>
       </el-form-item>
 
       <el-form-item label="家庭住址：" required>
         <el-col :span="7">
-          <el-form-item prop="date1">
-            <el-cascader size="large" :options="areaData" v-model="selectedOptions" @change="handleChange" class="small-select-ads"> </el-cascader>
+          <el-form-item prop="address">
+            <el-cascader
+              size="large"
+              placeholder="请选择地址"
+              :options="areaData"
+              v-model="ruleForm.address"
+              @change="handleChange"
+              class="small-select-ads"
+            >
+            </el-cascader>
           </el-form-item>
         </el-col>
         <el-col :span="10">
-          <el-form-item label="详细地址：" prop="date2">
-            <el-input type="textarea" placeholder="请输入内容" v-model="textarea" :autosize="true"> </el-input>
+          <el-form-item label="详细地址：" prop="addressArea">
+            <el-input type="textarea" placeholder="请填写详细地址" v-model="ruleForm.addressArea" :autosize="true" class="address"> </el-input>
           </el-form-item>
         </el-col>
       </el-form-item>
@@ -72,17 +80,16 @@
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item label="照片：" prop="imgurl">
+          <el-form-item label="照片：" prop="coverFile">
             <el-upload
               class="avatar-uploader"
               action="https://jsonplaceholder.typicode.com/posts/"
               :show-file-list="false"
-              :file-list="ruleForm.files"
-              :on-success="handleAvatarSuccess"
               :before-upload="beforeAvatarUpload"
-              :multiple="true"
+              v-model="ruleForm.coverFile"
+              :multiple="false"
             >
-              <img v-if="eduImageUrl" :src="ruleForm.eduImageUrl" class="avatar" />
+              <img v-if="ruleForm.coverUrl" :src="ruleForm.coverUrl" class="avatar" />
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </el-form-item>
@@ -98,6 +105,8 @@
 </template>
 
 <script>
+import axios from "axios";
+import qs from "qs";
 import { regionDataPlus } from "element-china-area-data";
 const favorite = [
   {
@@ -125,14 +134,15 @@ export default {
   name: "UserInfor",
   data() {
     return {
-      eduImageUrl: true,
       options: favorite,
       education: ["博士", "硕士", "本科", "大专"],
       areaData: regionDataPlus,
-      selectedOptions: [],
+
       textarea: "",
       ruleForm: {
+        address: [],
         dateBirth: "",
+        addressArea: "",
         region: [],
         name: "",
         birthDate: "",
@@ -143,13 +153,10 @@ export default {
         education: "",
         eduStartTime: "",
         eduEndTime: "",
-        files: [],
-        eduImageUrl: "",
-        date2: "",
-        delivery: false,
+        coverFile: "",
+        coverUrl: "",
         type: [],
         sex: "",
-        desc: "",
       },
       pickerOptions0: {
         disabledDate(time) {
@@ -184,6 +191,11 @@ export default {
         ],
         landline: [{ required: true, message: "请输入座机号码", trigger: "blur" }],
         region: [{ required: true, message: "请选择爱好", trigger: "change" }],
+        address: [{ required: true, message: "请选择地址", trigger: "change" }],
+        addressArea: [{ required: true, message: "请填写详细地址", trigger: ["blur", "change"] }],
+        education: [{ required: true, message: "请选择学历", trigger: "change" }],
+        coverFile: [{ required: true, message: "请上传学历照片", trigger: "change" }],
+        education: [{ required: true, message: "请选择学历", trigger: "change" }],
         education: [{ required: true, message: "请选择学历", trigger: "change" }],
         birthDate: [
           {
@@ -193,19 +205,19 @@ export default {
             trigger: "change",
           },
         ],
-        date2: [
+        eduStartTime: [
           {
             type: "date",
             required: true,
-            message: "请选择时间",
+            message: "请选择开始时间",
             trigger: "change",
           },
         ],
-        type: [
+        eduEndTime: [
           {
-            type: "array",
+            type: "date",
             required: true,
-            message: "请至少选择一个活动性质",
+            message: "请选择结束时间",
             trigger: "change",
           },
         ],
@@ -224,9 +236,25 @@ export default {
   components: {},
   methods: {
     submitForm(formName) {
+      console.log(formName);
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert("submit!");
+          console.log("submit!");
+          let formData = new FormData();
+          formData.append("name", this.ruleForm[0]);
+          axios
+            .post("/api", qs.stringify(this.ruleForm, { arrayFormat: "indices", allowDots: true }))
+            .then((res) => {
+              console.log(res.data);
+              if (res.data.ret) {
+                console.log("添加成功");
+              } else {
+                console.log("添加失败");
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
         } else {
           console.log("error submit!!");
           return false;
@@ -240,26 +268,45 @@ export default {
       console.log(value);
       console.log(CodeToText[value[0]], CodeToText[value[1]], CodeToText[value[2]]);
     },
-    handleAvatarSuccess(res, file) {
-      this.ruleForm.eduImageUrl = URL.createObjectURL(file.raw);
+    imagePreview: function (file) {
+      var self = this;
+      //定义一个文件阅读器
+      var reader = new FileReader();
+      //文件装载后将其显示在图片预览里
+      reader.onload = function (e) {
+        //将bade64位图片保存至数组里供上面图片显示
+        self.ruleForm.coverUrl = e.target.result;
+      };
+      reader.readAsDataURL(file);
     },
     beforeAvatarUpload(file) {
       const isJPG = file.type === "image/jpeg";
-      const isLt2M = file.size / 1024 / 1024 < 2;
+      const isPNG = file.type === "image/png";
+      const isLt1M = file.size / 1024 / 1024 < 2;
 
-      if (!isJPG) {
-        this.$message.error("上传头像图片只能是 JPG 格式!");
+      if (!isJPG && !isPNG) {
+        this.$message.error("上传头像图片只能是 JPG 或 PNG 格式!");
+      } else if (!isLt1M) {
+        this.$message.error("上传头像图片大小不能超过 1MB!");
+      } else {
+        this.ruleForm.coverFile = file;
+        this.imagePreview(this.ruleForm.coverFile);
       }
-      if (!isLt2M) {
-        this.$message.error("上传头像图片大小不能超过 2MB!");
-      }
-      return isJPG && isLt2M;
+
+      // 不使用upload自带的上传方式，而是使用axios，所以阻止upload自带的上传
+      return false;
     },
   },
 };
 </script>
 
 <style lang="scss">
+.address {
+  textarea {
+    min-height: 40px !important;
+    height: 40px !important;
+  }
+}
 .small-select-ads {
   width: 100%;
 }
@@ -297,5 +344,15 @@ export default {
   width: 120px;
   height: 120px;
   display: block;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+}
+/* chrome */
+
+input[type="number"] {
+  -moz-appearance: textfield; /* firefox */
 }
 </style>

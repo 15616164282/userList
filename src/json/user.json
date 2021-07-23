@@ -1,0 +1,93 @@
+{
+  "work": [
+    {
+     "id":0, 
+    "name": "小王",
+    "StartTime":"2021-07-15",
+    "EndTime":"2022-09-04",
+    "company":"湖南成功软件有限公司",
+    "position":"实习生"
+    },{
+      "id":1, 
+      "name": "小王",
+      "StartTime":"2021-07-15",
+      "EndTime":"2022-09-01",
+      "company":"湖南成功软件ddd有限公司",
+      "position":"实习生"
+      },{
+        "id":2, 
+      "name": "小四",
+      "StartTime":"2020-06-11",
+      "EndTime":"2021-07-12",
+      "company":"湖南堆和栈",
+      "position":"前端工程师"
+    },{
+      "id":3, 
+      "name": "小张",
+      "StartTime":"2020-03-21",
+      "EndTime":"2021-05-23",
+      "company":"云珠大数据有限公司",
+      "position":"前端工程师"
+    },{
+      "id":4, 
+      "name": "王五",
+      "StartTime":"2017-06-23",
+      "EndTime":"2019-09-31",
+      "company":"凯普沃克",
+      "position":"实习生"
+    },{
+      "id":5, 
+      "name": "李四",
+      "StartTime":"2020-06-12",
+      "EndTime":"2021-09-10",
+      "company":"新锐和达",
+      "position":"产品经理"
+    }
+  ],
+  "study":[
+    {
+      "id":0, 
+      "name": "李四",
+      "StartTime":"2019-09-01",
+      "EndTime":"2021-06-30",
+      "company":"湖南涉外经济学院",
+      "position":"本科",
+      "hobby":"跳舞"
+      },{
+        "id":1, 
+        "name": "李武",
+        "StartTime":"2019-09-01",
+        "EndTime":"2021-06-30",
+        "company":"潇湘中学",
+        "position":"大专",
+        "hobby":"跑步"
+      },{
+        "id":2, 
+        "name": "宋天",
+        "StartTime":"2019-09-01",
+        "EndTime":"2021-06-30",
+        "company":"长郡中学",
+        "position":"高中",
+        "hobby":"看电影"
+      },{
+        "id":3, 
+        "name": "立白",
+        "StartTime":"2019-09-01",
+        "EndTime":"2021-06-30",
+        "company":"湖南大学",
+        "position":"硕士",
+        "hobby":"旅游"
+      },{
+        "id":4, 
+        "name": "雕牌",
+        "StartTime":"2019-09-01",
+        "EndTime":"2021-06-30",
+        "company":"北京大学",
+        "position":"博士",
+        "hobby":"滑行"
+      }
+  ],
+  "echarts":[{"value":22,"name":"跳舞"},{"value":23,"name":"唱歌"},{"value":25,"name":"滑滑板"},{"value":27,"name":"篮球"},{"value":45,"name":"看书"}]
+  
+}
+

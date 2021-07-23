@@ -13,7 +13,7 @@ module.exports = {
     port: 8088,
     proxy: {
       "/api": {
-        target: "http://192.168.1.113:8888",
+        target: "http://www.zhanghc.top/api/productName",
         changeOrigin: true,
         pathRewrite: {
           "^/api": "",

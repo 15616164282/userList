@@ -1,16 +1,212 @@
 <template>
-  <div class=""></div>
+  <div class="UserExper">
+    <el-switch v-model="workStudy" active-text="工作经历" change="alert('sss')" inactive-text="学习经历"> </el-switch>
+    <el-button size="small" @click="handleAdd()" style="margin-left: 15px">新增</el-button>
+    <!-- <e-col :span="2"></e-col> -->
+    <el-table :data="tableData" style="width: 100%" stripe ref="filterTable">
+      <el-table-column label="姓名" width="90" prop="name" column-key="name" :filters="namefilter" :filter-method="filterHandler">
+        <template slot-scope="scope">
+          <span style="margin-left: 10px">{{ scope.row.name }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="开始时间" width="180" prop="StartTime" column-key="StartTime" :filters="StartTimefilter" :filter-method="filterHandler">
+        <template slot-scope="scope">
+          <i class="el-icon-time"></i>
+          <span style="margin-left: 10px">{{ scope.row.StartTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="结束时间" width="180" prop="EndTime" column-key="EndTime" :filters="EndTimefilter" :filter-method="filterHandler">
+        <template slot-scope="scope">
+          <i class="el-icon-time"></i>
+          <span style="margin-left: 10px">{{ scope.row.EndTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="公司/单位 " width="220">
+        <template slot-scope="scope">
+          <i class="el-icon-office-building"></i>
+          <span style="margin-left: 10px">{{ scope.row.company }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="职称" width="150">
+        <template slot-scope="scope">
+          <span style="margin-left: 10px">{{ scope.row.position }}</span>
+        </template>
+      </el-table-column>
+      <!-- <el-table-column label="结束时间" width="180">
+        <template slot-scope="scope">
+          <el-popover trigger="hover" placement="top">
+            <p>姓名: {{ scope.row.name }}</p>
+            <p>住址: {{ scope.row.address }}</p>
+            <div slot="reference" class="name-wrapper">
+              <el-tag size="medium">{{ scope.row.name }}</el-tag>
+            </div>
+          </el-popover>
+        </template>
+      </el-table-column> -->
+      <el-table-column label="操作">
+        <template slot-scope="scope">
+          <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <el-dialog :title="dialog.title" :visible.sync="showdialog" :close-on-click-modal="false" :close-on-press-escape="false">
+      <el-form label-width="110px">
+        <el-form-item label="姓名：">
+          <el-col :span="4">
+            <el-input v-model="dialog.name" input="chang()"></el-input>
+          </el-col>
+        </el-form-item>
+        <el-form-item label="开始时间：">
+          <el-col :span="6">
+            <el-date-picker v-model="dialog.StartTime" type="date" placeholder="选择日期" value-format="yyyy-MM-dd"> </el-date-picker>
+          </el-col>
+        </el-form-item>
+        <el-form-item label="结束时间：">
+          <el-col :span="6">
+            <el-date-picker v-model="dialog.EndTime" type="date" placeholder="选择日期" value-format="yyyy-MM-dd"> </el-date-picker>
+          </el-col>
+        </el-form-item>
+        <el-form-item :label="workStudy ? '公司/单位：' : '学校：'">
+          <el-col :span="8">
+            <el-input v-model="dialog.company"></el-input>
+          </el-col>
+        </el-form-item>
+        <!-- <el-form-item label="" v-else>
+          <el-col :span="8">
+            <el-input v-model="dialog.company"></el-input>
+          </el-col>
+        </el-form-item> -->
+        <el-form-item label="职位：" v-if="workStudy">
+          <el-col :span="4">
+            <el-input v-model="dialog.position"></el-input>
+          </el-col>
+        </el-form-item>
+        <el-form-item label="爱好：" v-else>
+          <el-col :span="8">
+            <el-input v-model="dialog.hobby"></el-input>
+          </el-col>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="showdialog = false">取 消</el-button>
+        <el-button type="primary" @click="define()">确 定</el-button>
+      </div>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
+import userData from "../json/user.json";
 export default {
   name: "UserExper",
   data() {
-    return {};
+    return {
+      tableData: userData.work,
+      workStudy: true,
+      dialog: {},
+      namefilter: [],
+      StartTimefilter: [],
+      EndTimefilter: [],
+      showdialog: false,
+      add: false,
+    };
+  },
+  watch: {
+    workStudy(newval, oldval) {
+      if (newval == true) {
+        this.tableData = userData.work;
+      } else {
+        this.tableData = userData.study;
+      }
+    },
   },
   components: {},
-  methods: {},
+  methods: {
+    define() {
+      if (this.dialog.title == "新增数据") {
+        this.tableData.push(this.dialog);
+        this.showdialog = false;
+      } else if (this.dialog.title == "编辑数据") {
+        this.showdialog = false;
+      }
+    },
+    handleAdd() {
+      this.del = true;
+      this.showdialog = true;
+      this.dialog = Object.assign(this.dialog, { title: "新增数据" });
+    },
+    chang() {
+      console.log("aaaa");
+    },
+    handleEdit(index, row) {
+      console.log(index, row);
+      this.del = true;
+      this.showdialog = true;
+      this.dialog = Object.assign(this.dialog, row, { title: "编辑数据" });
+    },
+    //删除行数据
+    handleDelete(index, row) {
+      this.$confirm("确定删除这条数据, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "删除成功!",
+          });
+          console.log(index);
+          this.tableData = this.tableData.filter((o) => o.id != row.id);
+          console.log(this.tableData);
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
+    resetDateFilter() {
+      this.$refs.filterTable.clearFilter("date");
+    },
+    clearFilter() {
+      this.$refs.filterTable.clearFilter();
+    },
+    formatter(row, column) {
+      return row.address;
+    },
+    filterTag(value, row) {
+      return row.tag === value;
+    },
+    filterHandler(value, row, column) {
+      const property = column["property"];
+      return row[property] === value;
+    },
+    filter() {
+      const table = this.tableData;
+      for (let i = 0; i < table.length; i++) {
+        // const element = array[i];
+        let name = { text: table[i].name, value: table[i].name };
+        let staTime = { text: table[i].StartTime, value: table[i].StartTime };
+        let endTime = { text: table[i].EndTime, value: table[i].EndTime };
+        this.namefilter.push(name);
+        this.StartTimefilter.push(staTime);
+        this.EndTimefilter.push(endTime);
+      }
+    },
+  },
+  mounted() {
+    this.filter();
+  },
 };
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.UserExper {
+  width: 63%;
+  margin: 10px auto;
+}
+</style>
