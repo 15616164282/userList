@@ -1,7 +1,7 @@
 <template>
   <div class="">
     <div id="chart1" style="height: 100%"></div>
-    <div id="chart2" style="height: 100%"></div>
+    <div id="chart2" style="height: 400px"></div>
   </div>
 </template>
 
@@ -18,8 +18,8 @@ export default {
   components: {},
   methods: {
     getArrayProps(array, key) {
-      let key = key || "value";
-      let res = [];
+      var key = key || "value";
+      var res = [];
       if (array) {
         array.forEach(function (t) {
           res.push(t[key]);
@@ -113,8 +113,7 @@ export default {
               scale: true,
               max: 100,
               min: 0,
-              splitNumber: 5,
-              lineHeight: "100px",
+              splitNumber: 10,
               boundaryGap: [0.2, 0.2],
             },
           ],
@@ -141,5 +140,6 @@ export default {
 <style scoped lang="scss">
 #chart2 {
   margin-top: 25px;
+  height: 500px !important;
 }
 </style>

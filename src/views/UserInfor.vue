@@ -3,7 +3,7 @@
     <h3 style="text-align: center; line-height: 25px">个人信息</h3>
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="110px" class="demo-ruleForm">
       <el-form-item label="姓名：" prop="name" class="small">
-        <el-input v-model="ruleForm.name"></el-input>
+        <el-input v-model="ruleForm.name" clearable></el-input>
       </el-form-item>
 
       <el-form-item label="性别：" prop="sex">
@@ -20,19 +20,19 @@
       </el-form-item>
 
       <el-form-item label="身份证号码：" prop="IDCard" class="small">
-        <el-input v-model="ruleForm.IDCard" type="number"></el-input>
+        <el-input v-model="ruleForm.IDCard" type="number" clearable></el-input>
       </el-form-item>
 
       <el-form-item label="手机号码：" prop="phone" class="small">
-        <el-input v-model="ruleForm.phone" type="number"></el-input>
+        <el-input v-model="ruleForm.phone" type="number" clearable></el-input>
       </el-form-item>
 
       <el-form-item label="座机号码：" prop="landline" class="small">
-        <el-input v-model="ruleForm.landline" type="number"></el-input>
+        <el-input v-model="ruleForm.landline" type="number" clearable></el-input>
       </el-form-item>
 
       <el-form-item label="邮箱：" prop="email" class="small">
-        <el-input v-model="ruleForm.email" type="email"></el-input>
+        <el-input v-model="ruleForm.email" type="email" clearable></el-input>
       </el-form-item>
 
       <el-form-item label="出生年月：" prop="birthDate">
@@ -50,13 +50,15 @@
               v-model="ruleForm.address"
               @change="handleChange"
               class="small-select-ads"
+              clearable
             >
             </el-cascader>
           </el-form-item>
         </el-col>
         <el-col :span="10">
           <el-form-item label="详细地址：" prop="addressArea">
-            <el-input type="textarea" placeholder="请填写详细地址" v-model="ruleForm.addressArea" :autosize="true" class="address"> </el-input>
+            <el-input type="textarea" placeholder="请填写详细地址" v-model="ruleForm.addressArea" :autosize="true" class="address" clearable>
+            </el-input>
           </el-form-item>
         </el-col>
       </el-form-item>
@@ -71,12 +73,24 @@
         </el-col>
         <el-col :span="6">
           <el-form-item label="开始日期：" prop="eduStartTime">
-            <el-date-picker type="date" placeholder="选择开始日期" v-model="ruleForm.eduStartTime" style="width: 100%"></el-date-picker>
+            <el-date-picker
+              type="date"
+              placeholder="选择开始日期"
+              :picker-options="pickerOptionsStart"
+              v-model="ruleForm.eduStartTime"
+              style="width: 100%"
+            ></el-date-picker>
           </el-form-item>
         </el-col>
         <el-col :span="6">
           <el-form-item label="结束日期：" prop="eduEndTime">
-            <el-date-picker type="date" placeholder="选择结束日期" v-model="ruleForm.eduEndTime" style="width: 100%"></el-date-picker>
+            <el-date-picker
+              type="date"
+              placeholder="选择结束日期"
+              :picker-options="pickerOptionsEnd"
+              v-model="ruleForm.eduEndTime"
+              style="width: 100%"
+            ></el-date-picker>
           </el-form-item>
         </el-col>
         <el-col :span="8">
@@ -163,6 +177,23 @@ export default {
           return time.getTime() > Date.now() - 8.64e6;
         },
       },
+      // 开始结束日期限制
+      pickerOptionsStart: {
+        disabledDate: (time) => {
+          if (this.ruleForm.eduEndTime) {
+            return time.getTime() >= new Date(this.ruleForm.eduEndTime).getTime();
+          }
+        },
+      },
+      // 结束日期限制
+      pickerOptionsEnd: {
+        disabledDate: (time) => {
+          if (this.ruleForm.eduStartTime) {
+            return time.getTime() <= new Date(this.ruleForm.eduStartTime).getTime();
+          }
+        },
+      },
+
       rules: {
         name: [
           { required: true, message: "请输入姓名", trigger: "blur" },
@@ -236,7 +267,6 @@ export default {
   components: {},
   methods: {
     submitForm(formName) {
-      console.log(formName);
       this.$refs[formName].validate((valid) => {
         if (valid) {
           console.log("submit!");
