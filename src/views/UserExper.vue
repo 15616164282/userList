@@ -214,19 +214,23 @@ export default {
       return true; //为空
     },
     query() {
-      let queForm = this.empty(this.queryForm);
-      if (JSON.stringify(this.queryForm) == "{}" || queForm) {
-      }
-      if (this.queryForm.hasOwnProperty("name") || this.queryForm.name == "") {
+      // let queForm = this.empty(this.queryForm);
+      // if (JSON.stringify(this.queryForm) == "{}" || queForm) {
+      // }
+      if (this.queryForm.hasOwnProperty("name") || this.queryForm.name != "") {
         this.tableData = this.tableData.filter((o) => o.name == this.queryForm.name);
-      } else if (this.queryForm.hasOwnProperty("StartTime") || this.queryForm.StartTime == "null") {
+      } else if (this.queryForm.hasOwnProperty("StartTime") || this.queryForm.StartTime != "null") {
         this.tableData = this.tableData.filter((o) => o.StartTime == this.queryForm.StartTime);
-      } else if (this.queryForm.hasOwnProperty("EndTime") || this.queryForm.EndTime == "null") {
+      } else if (this.queryForm.hasOwnProperty("EndTime") || this.queryForm.EndTime != "null") {
         this.tableData = this.tableData.filter((o) => o.EndTime == this.queryForm.EndTime);
-      } else if (this.queryForm.hasOwnProperty("position") || this.queryForm.position == "") {
+      } else if (this.queryForm.hasOwnProperty("position") || this.queryForm.position != "") {
         this.tableData = this.tableData.filter((o) => o.position == this.queryForm.position);
-      } else if (this.queryForm.hasOwnProperty("hobby") || this.queryForm.position == "") {
+      } else if (this.queryForm.hasOwnProperty("hobby") || this.queryForm.position != "") {
         this.tableData = this.tableData.filter((o) => o.hobby == this.queryForm.hobby);
+      } else if (workStudy == true) {
+        this.tableData = Object.assign({}, userData.work);
+      } else {
+        this.tableData = Object.assign({}, userData.study);
       }
       // this.tableData = this.tableData
       //   .filter((o) => o.name == this.queryForm.name)
