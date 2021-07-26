@@ -1,7 +1,7 @@
 <template>
   <div class="">
     <div id="chart1" style="height: 100%"></div>
-    <div id="chart2" style="height: 100%"></div>
+    <div id="chart2" style="height: 400px"></div>
   </div>
 </template>
 
@@ -17,10 +17,17 @@ export default {
   },
   components: {},
   methods: {
+    getArrayProps(array, key) {
+      var key = key || "value";
+      var res = [];
+      if (array) {
+        array.forEach(function (t) {
+          res.push(t[key]);
+        });
+      }
+      return res;
+    },
     initChart1() {
-      // let ser_data = this.formatChart();
-      // let count = this.arrCount(ser_data);
-      // console.log(ser_data);
       let myChart = echarts.init(document.getElementById("chart1"));
       myChart.setOption(
         {
@@ -37,14 +44,6 @@ export default {
               fontSize: 14,
               lineHeight: 15,
             },
-            // formatter: function (name) {
-            //   //找到data中name和文本name值相同的对象
-            //   const val = ser_data.filter((item) => {
-            //     return item.name === name;
-            //   });
-            //   // return name + '  ' + ((val[0].value / count).toFixed(4)) * 100 + '%'
-            //   return name + "  " + val[0].value + "(" + Math.round((val[0].value / count) * 10000) / 100 + "%" + ")";
-            // },
           },
           tooltip: {
             trigger: "item",
@@ -89,172 +88,44 @@ export default {
       let myChart = echarts.init(document.getElementById("chart2"));
       myChart.setOption(
         {
+          tooltip: {
+            trigger: "axis",
+            axisPointer: {
+              // 坐标轴指示器，坐标轴触发有效
+              type: "shadow", // 默认为直线，可选为：'line' | 'shadow'
+            },
+          },
           grid: {
-            top: "15%",
-            left: -30,
-            bottom: 0,
-            right: 0,
+            left: "3%",
+            right: "4%",
+            bottom: "3%",
             containLabel: true,
           },
           xAxis: [
             {
-              show: true,
-              data: this.hobby.name,
-              offset: "2",
               type: "category",
-              axisLabel: {
-                inside: true,
-                textStyle: {
-                  color: "#fff",
-                },
-              },
+              data: this.getArrayProps(this.hobby, "name"),
               axisTick: {
-                show: true,
+                alignWithLabel: true,
               },
-              axisLine: {
-                show: false,
-              },
-              splitArea: {
-                // 网格区域
-                show: false, // 是否显示，默认为false
-              },
-              splitLine: {
-                // gird 区域中的分割线
-                show: false, // 是否显示
-                lineStyle: {
-                  color: "#666",
-                  width: 1,
-                  type: "dashed",
-                },
-              },
-              z: 10,
-            },
-            {
-              show: true,
-              data: [100, 89.2, 92.3, 98.4, 87.7, 88.3, 75.1, 92.5],
-              // type: 'category',
-              position: "top",
-              axisLabel: {
-                inside: true,
-                textStyle: {
-                  color: "#fff",
-                },
-              },
-              axisTick: {
-                show: false,
-              },
-              axisLine: {
-                show: false,
-              },
-              splitArea: {
-                // 网格区域
-                show: false, // 是否显示，默认为false
-              },
-              splitLine: {
-                // gird 区域中的分割线
-                show: false, // 是否显示
-                lineStyle: {
-                  color: "#666",
-                  width: 1,
-                  type: "dashed",
-                },
-              },
-              z: 10,
             },
           ],
-          yAxis: {
-            show: false,
-            axisLine: {
-              show: false,
-            },
-            axisTick: {
-              show: false,
-            },
-            axisLabel: {
-              textStyle: {
-                color: "#999",
-              },
-            },
-            barGap: "10%",
-            splitLine: {
-              // gird 区域中的分割线
-              show: false, // 是否显示
-              lineStyle: {
-                color: "#666",
-                width: 1,
-                type: "dashed",
-              },
-            },
-          },
-          dataZoom: [
+          yAxis: [
             {
-              type: "inside",
+              type: "value",
+              scale: true,
+              max: 100,
+              min: 0,
+              splitNumber: 10,
+              boundaryGap: [0.2, 0.2],
             },
           ],
-          // toolbox: {
-          //   show: false
-          // },
-          // labelLine: {
-          //   show: false
-          // },
           series: [
             {
+              name: "直接访问",
               type: "bar",
-              showBackground: false,
-              data: this.hobby.value,
-              barWidth: "12px", //柱子宽度
-              barGap: "-100%",
-              itemStyle: {
-                normal: {
-                  color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                    {
-                      offset: 0,
-                      color: "#ffffff",
-                    },
-                    {
-                      offset: 1,
-                      color: "#333",
-                    },
-                  ]),
-                  barBorderRadius: [30, 30, 30, 30],
-                },
-              },
-              label: {
-                normal: {
-                  show: false,
-                  position: "inside",
-                  // formatter: '{b}',
-                  color: "#464674",
-                  textStyle: {
-                    fontSize: "14",
-                  },
-                },
-              },
-              zlevel: 99,
-            },
-            {
-              type: "bar",
-              showBackground: false,
-              data: [100, 100, 100, 100, 100, 100, 100, 100],
-              barWidth: "24px", //柱子宽度
-              barGap: "-150%",
-              itemStyle: {
-                normal: {
-                  color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                    {
-                      offset: 0,
-                      color: "#8ab9ff",
-                    },
-                    {
-                      offset: 1,
-                      color: "#706dfc",
-                    },
-                  ]),
-                  barBorderRadius: [30, 30, 30, 30],
-                },
-              },
-
-              zlevel: 0,
+              barWidth: "60%",
+              data: this.getArrayProps(this.hobby, "value"),
             },
           ],
         },
@@ -269,4 +140,9 @@ export default {
 };
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+#chart2 {
+  margin-top: 25px;
+  height: 500px !important;
+}
+</style>

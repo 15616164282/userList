@@ -2,7 +2,7 @@
   <div class="">
     <el-row type="flex">
       <el-menu
-        default-active="/UserInfor"
+        :default-active="$router.currentRoute.path"
         class="el-menu-vertical-demo"
         background-color="#545c64"
         text-color="#fff"
