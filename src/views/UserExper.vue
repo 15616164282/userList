@@ -32,17 +32,7 @@
           <span style="margin-left: 10px">{{ scope.row.position }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="结束时间" width="180">
-        <template slot-scope="scope">
-          <el-popover trigger="hover" placement="top">
-            <p>姓名: {{ scope.row.name }}</p>
-            <p>住址: {{ scope.row.address }}</p>
-            <div slot="reference" class="name-wrapper">
-              <el-tag size="medium">{{ scope.row.name }}</el-tag>
-            </div>
-          </el-popover>
-        </template>
-      </el-table-column> -->
+
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
@@ -185,6 +175,7 @@ export default {
       const property = column["property"];
       return row[property] === value;
     },
+
     filter() {
       const table = this.tableData;
       for (let i = 0; i < table.length; i++) {
