@@ -44,7 +44,7 @@
 
         <el-col :span="4" v-else>
           <el-form-item label="学历：">
-            <el-select v-model="queryForm.position" clearable placeholder="请选择学历" @blur="query">
+            <el-select v-model="queryForm.position" clearable placeholder="请选择学历" @change="query">
               <el-option v-for="item in education" :key="item" :label="item" :value="item"> </el-option>
             </el-select>
           </el-form-item>
@@ -64,6 +64,7 @@
       <el-button size="small" @click="clearFilter" style="margin-left: 25px">清除所有过滤器</el-button></el-row
     >
     <el-table :data="tableData" style="width: 100%" stripe ref="filterTable">
+      <template slot="empty">暂无数据</template>
       <el-table-column label="姓名" width="90" prop="name" column-key="name" :filters="namefilter" :filter-method="filterHandler">
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.name }}</span>
@@ -217,21 +218,26 @@ export default {
       // let queForm = this.empty(this.queryForm);
       // if (JSON.stringify(this.queryForm) == "{}" || queForm) {
       // }
-      if (this.queryForm.hasOwnProperty("name") || this.queryForm.name != "") {
+      if (this.queryForm.hasOwnProperty("name") && this.queryForm.name != "") {
         this.tableData = this.tableData.filter((o) => o.name == this.queryForm.name);
-      } else if (this.queryForm.hasOwnProperty("StartTime") || this.queryForm.StartTime != "null") {
-        this.tableData = this.tableData.filter((o) => o.StartTime == this.queryForm.StartTime);
-      } else if (this.queryForm.hasOwnProperty("EndTime") || this.queryForm.EndTime != "null") {
-        this.tableData = this.tableData.filter((o) => o.EndTime == this.queryForm.EndTime);
-      } else if (this.queryForm.hasOwnProperty("position") || this.queryForm.position != "") {
-        this.tableData = this.tableData.filter((o) => o.position == this.queryForm.position);
-      } else if (this.queryForm.hasOwnProperty("hobby") || this.queryForm.position != "") {
-        this.tableData = this.tableData.filter((o) => o.hobby == this.queryForm.hobby);
-      } else if (workStudy == true) {
-        this.tableData = Object.assign({}, userData.work);
-      } else {
-        this.tableData = Object.assign({}, userData.study);
       }
+      if (this.queryForm.hasOwnProperty("StartTime") && this.queryForm.StartTime != "null") {
+        this.tableData = this.tableData.filter((o) => o.StartTime == this.queryForm.StartTime);
+      }
+      if (this.queryForm.hasOwnProperty("EndTime") && this.queryForm.EndTime != "null") {
+        this.tableData = this.tableData.filter((o) => o.EndTime == this.queryForm.EndTime);
+      }
+      if (this.queryForm.hasOwnProperty("position") && this.queryForm.position != "") {
+        this.tableData = this.tableData.filter((o) => o.position == this.queryForm.position);
+      }
+      if (this.queryForm.hasOwnProperty("hobby") && this.queryForm.position != "") {
+        this.tableData = this.tableData.filter((o) => o.hobby == this.queryForm.hobby);
+      }
+      // if (this.workStudy == true) {
+      //   this.tableData = Object.assign({}, userData.work);
+      // } else {
+      //   this.tableData = Object.assign({}, userData.study);
+      // }
       // this.tableData = this.tableData
       //   .filter((o) => o.name == this.queryForm.name)
       //   .filter((o) => o.StartTime == this.queryForm.StartTime)
@@ -289,7 +295,15 @@ export default {
       this.$refs.filterTable.clearFilter("date");
     },
     clearFilter() {
-      this.$refs.filterTable.clearFilter();
+      console.log("fla");
+      // this.$refs.filterTable.clearFilter();
+      this.tableData = {};
+      this.queryForm = {};
+      if (this.workStudy == true) {
+        this.tableData = userData.work;
+      } else {
+        this.tableData = userData.study;
+      }
     },
     formatter(row, column) {
       return row.address;

@@ -26,6 +26,18 @@ const routes = [
         path: "/UserEchart",
         name: "UserEchart",
         component: () => import("../views/UserEchart.vue"),
+      }, {
+        path: "/CompanyAdd",
+        name: "CompanyAdd",
+        component: () => import("../views/CompanyAdd.vue"),
+      }, {
+        path: "/CompanyManag",
+        name: "CompanyManag",
+        component: () => import("../views/CompanyManag.vue"),
+      }, {
+        path: "/map",
+        name: "map",
+        component: () => import("../views/map.vue"),
       },
     ]
   },

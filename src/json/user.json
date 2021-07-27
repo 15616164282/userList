@@ -13,7 +13,7 @@
       "StartTime":"2021-07-15",
       "EndTime":"2022-09-01",
       "company":"湖南成功软件ddd有限公司",
-      "position":"实习生"
+      "position":"实习"
       },{
         "id":2, 
       "name": "小四",
@@ -84,6 +84,14 @@
         "EndTime":"2021-06-30",
         "company":"北京大学",
         "position":"博士",
+        "hobby":"滑行"
+      },{
+        "id":5, 
+        "name": "雕牌",
+        "StartTime":"2019-09-01",
+        "EndTime":"2021-06-30",
+        "company":"北京大学",
+        "position":"大专",
         "hobby":"滑行"
       }
   ],
