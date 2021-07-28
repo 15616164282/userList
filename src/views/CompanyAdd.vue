@@ -35,14 +35,14 @@
             <el-form-item label="单位简称：" prop="shortName">
               <el-input v-model="firmData.shortName" placeholder="请输入内容"></el-input>
             </el-form-item>
-            <el-form-item label="单位法人：" prop="legalName">
+            <el-form-item label="法定代表人：" prop="legalName">
               <el-input v-model="firmData.legalName" placeholder="请输入内容"></el-input>
             </el-form-item>
-            <!-- <el-form-item label="涉及业务：" prop="sjywMsg">
+            <el-form-item label="涉及业务：" prop="sjywMsg">
               <el-select style="width: 100%; height: 40px" v-model="firmData.sjywMsg" multiple placeholder="请选择">
                 <el-option v-for="item in timeList" :key="item.id" :label="item.value" :value="item.id"></el-option>
               </el-select>
-            </el-form-item> -->
+            </el-form-item>
             <!-- <el-form-item :label="gmLabel" prop="annual_waste_scale">
               <el-select v-model="firmData.annual_waste_scale" placeholder="请选择" style="width: 100%">
                 <el-option v-for="item in selDataTsIII" :key="item.id" :label="item.value" :value="item.code"></el-option>
@@ -50,51 +50,64 @@
             </el-form-item> -->
 
             <el-form-item label="设施详细地址：" prop="equipment_address">
-              <el-input v-model="firmData.equipment_address"></el-input>
+              <el-input v-model="firmData.equipment_address" placeholder="请输入内容"></el-input>
             </el-form-item>
             <el-form-item label="单位地址：" prop="registration_address">
-              <el-input v-model="firmData.registration_address"></el-input>
+              <el-input v-model="firmData.registration_address" placeholder="请输入内容"></el-input>
             </el-form-item>
             <el-form-item label="设施所在地环保局：">
-              <el-input v-model="firmDataEpaName" disabled></el-input>
+              <el-input v-model="firmDataEpaName" disabled placeholder="请输入内容"></el-input>
             </el-form-item>
-            <el-form-item label="设施经纬度：" prop="equipment_longitude" style="width: 100%">
-              <el-input v-model="firmData.equipment_longitude" disabled style="width: 14%"></el-input>
-              <el-input v-model="firmData.equipment_latitude" disabled style="width: 14%; margin-left: 20px"></el-input>
-              <el-button type="primary" style="margin-left: 20px; display: inline-block" @click="markerAg">获取经纬度 </el-button>
+            <el-form-item label="设施经度：" prop="equipment_longitude">
+              <el-input v-model="firmData.equipment_longitude" disabled placeholder="请输入内容">
+              </el-input>
+              <!-- <el-button type="primary" style="margin-left: 20px; display: inline-block" @click="markerAg">获取经纬度 </el-button> -->
+            </el-form-item>
+            <el-form-item label="设施纬度：" prop="equipment_longitude">
+              <el-input v-model="firmData.equipment_latitude" disabled placeholder="请输入内容">
+                <el-button slot="append" type="primary" @click="markerAg">获取经纬度</el-button>
+              </el-input>
+              <!-- <el-button type="primary" style="margin-left: 20px; display: inline-block" @click="markerAg">获取经纬度 </el-button> -->
             </el-form-item>
             <el-form-item label="联系人：" prop="contacts">
-              <el-input v-model="firmData.contacts"></el-input>
+              <el-input v-model="firmData.contacts" placeholder="请输入内容"></el-input>
             </el-form-item>
             <el-form-item label="联系电话：" prop="contactsTel">
               <el-input v-model="firmData.contactsTel" placeholder="请输入11位手机号码"></el-input>
             </el-form-item>
             <el-form-item label="年总产值（万元）：" prop="total_output_value">
-              <el-input v-model="firmData.total_output_value"></el-input>
+              <el-input v-model="firmData.total_output_value" placeholder="请输入内容"></el-input>
             </el-form-item>
             <el-form-item label="职工总数：" prop="staff_number">
-              <el-input v-model="firmData.staff_number"></el-input>
+              <el-input v-model="firmData.staff_number" placeholder="请输入内容"></el-input>
             </el-form-item>
-            <el-form-item label="占地面积（平方米）：" prop="floor_space">
-              <el-input v-model="firmData.floor_space"></el-input>
+            <el-form-item label="占地面积：" prop="floor_space">
+              <el-input v-model="firmData.floor_space" placeholder="请输入内容">
+                <template slot="append">平方米</template>
+              </el-input>
+            </el-form-item>
+            <el-form-item label="注册资金：" prop="floor_space">
+              <el-input v-model="firmData.floor_space" placeholder="请输入内容">
+                <template slot="append">万元</template>
+              </el-input>
             </el-form-item>
             <el-form-item label="环保负责人姓名：" prop="epb_head">
-              <el-input v-model="firmData.epb_head"></el-input>
+              <el-input v-model="firmData.epb_head" placeholder="请输入内容"></el-input>
             </el-form-item>
             <el-form-item label="专职环保人员数：" prop="env_protection_person_count">
-              <el-input v-model="firmData.env_protection_person_count"></el-input>
+              <el-input v-model="firmData.env_protection_person_count" placeholder="请输入内容"></el-input>
             </el-form-item>
             <el-form-item label="传真号码：" prop="fax">
-              <el-input v-model="firmData.fax"></el-input>
+              <el-input v-model="firmData.fax" placeholder="请输入内容"></el-input>
             </el-form-item>
             <el-form-item label="邮政编码：" prop="zipCode">
-              <el-input v-model="firmData.zipCode"></el-input>
+              <el-input v-model="firmData.zipCode" placeholder="请输入内容"></el-input>
             </el-form-item>
             <el-form-item label="邮箱：" prop="contactsEmail">
-              <el-input v-model="firmData.contactsEmail"></el-input>
+              <el-input v-model="firmData.contactsEmail" placeholder="请输入内容"></el-input>
             </el-form-item>
             <el-form-item label="单位网址：" prop="website">
-              <el-input v-model="firmData.website"></el-input>
+              <el-input v-model="firmData.website" placeholder="请输入内容"></el-input>
             </el-form-item>
 
             <el-form-item label="涉及业务：" style="width: 100%" prop="contain_type">
@@ -156,6 +169,8 @@
 </template>
 
 <script>
+import axios from "axios";
+import qs from "qs";
 export default {
   name: "CompanyAdd",
   data() {
@@ -360,7 +375,19 @@ export default {
     submitClick(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert("submit!");
+          axios
+            .post("/api", qs.stringify(this.firmData, { arrayFormat: "indices", allowDots: true }))
+            .then((res) => {
+              console.log(res.data);
+              if (res.data.ret) {
+                console.log("添加成功");
+              } else {
+                console.log("添加失败");
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
         } else {
           console.log("error submit!!");
           return false;
@@ -437,7 +464,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     justify-content: left;
-
+    margin-bottom: 56px;
     > div {
       width: 50%;
       display: flex;
