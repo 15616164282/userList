@@ -149,7 +149,6 @@
       </div>
     </div>
     <div class="submitBtn">
-      <el-button :loading="IsLoading" type="primary" @click="addFirm('firmData')">保存 </el-button>
       <el-button :loading="IsLoading" style="margin-left: 50px" type="primary" @click="submitClick('firmData')">提交</el-button>
       <el-button style="margin-left: 50px" @click="closeFirm()">取 消</el-button>
     </div>
@@ -358,6 +357,16 @@ export default {
   components: {},
   methods: {
     changeqtyw() {},
+    submitClick(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          alert("submit!");
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
   },
 };
 </script>

@@ -1,14 +1,18 @@
 <template>
-  <div class="">map</div>
+  <div class="">
+    <mapView></mapView>
+  </div>
 </template>
 
 <script>
+import mapView from "../components/mapView.vue";
 export default {
   name: "map",
+  components: { mapView },
   data() {
     return {};
   },
-  components: {},
+
   methods: {},
 };
 </script>
