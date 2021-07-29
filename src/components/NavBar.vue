@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="navbar">
-      <div class="hidden-menu"><i class="el-icon-s-fold"></i></div>
+      <div class="hidden-menu" @click="collapse"><i :class="flag?'el-icon-s-unfold fontsize':'el-icon-s-fold fontsize'"></i></div>
       <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
         <el-breadcrumb-item>活动管理</el-breadcrumb-item>
@@ -13,13 +13,21 @@
 </template>
 
 <script>
+import Bus from './bus';
 export default {
   name: "NavBar",
   data() {
-    return {};
+    return {
+      flag:true,
+    };
   },
   components: {},
-  methods: {},
+  methods: {
+    collapse(){
+      this.flag=!this.flag;
+      Bus.$emit('collapse', this.flag);
+    },
+  },
 };
 </script>
 
@@ -30,10 +38,12 @@ export default {
   .hidden-menu {
     float: left;
     margin-right: 15px;
-    i {
+    cursor: pointer;
+    .fontsize {
       font-size: 24px;
     }
   }
+
   .breadcrumb {
     float: left;
     line-height: 24px;

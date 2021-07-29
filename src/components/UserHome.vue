@@ -1,16 +1,8 @@
 <template>
   <div class="">
     <el-row type="flex">
-      <el-menu
-        :default-active="$router.currentRoute.path"
-        class="el-menu-vertical-demo"
-        background-color="#545c64"
-        text-color="#fff"
-        active-text-color="#ffd04b"
-        :collapse="false"
-        :router="true"
-        :unique-opened="true"
-      >
+      <el-menu :default-active="$router.currentRoute.path" class="el-menu-vertical-demo" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b" :collapse="isCollapse" :router="true"
+        :unique-opened="true">
         <el-submenu :index="i" v-for="(item, i) in menu" :key="i">
           <template slot="title">
             <i class="el-icon-location"></i>
@@ -40,14 +32,17 @@
       </el-menu>
       <el-col :span="24" style="padding-left: 10px; padding-top: 10px">
         <Navbar></Navbar>
-        <transition mode="out-in" name="slide-fade"><router-view /> </transition
-      ></el-col>
+        <transition mode="out-in" name="slide-fade">
+          <router-view />
+        </transition>
+      </el-col>
     </el-row>
   </div>
 </template>
 
 <script>
 import Navbar from "./NavBar.vue";
+import Bus from './bus';
 export default {
   name: "UserHome",
   components: {
@@ -55,6 +50,7 @@ export default {
   },
   data() {
     return {
+      isCollapse:true,
       menu: [
         {
           path: "",
@@ -80,6 +76,12 @@ export default {
     };
   },
   methods: {},
+  mounted(){
+    Bus.$on('collapse', collapse => {  
+            // console.log(collapse);  
+            this.isCollapse = collapse
+        });  
+  }
 };
 </script>
 

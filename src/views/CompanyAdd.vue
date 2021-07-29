@@ -64,13 +64,7 @@
             </el-form-item>
             <el-form-item label="设施纬度：" prop="equipment_longitude">
               <el-input v-model="firmData.equipment_latitude" disabled>
-                <el-button
-                  slot="append"
-                  type="primary"
-                  @click="dialogVisible = true"
-                  style="color: #fff; background-color: #409eff; border-color: #409eff; border-radius: 0px"
-                  >获取经纬度</el-button
-                >
+                <el-button slot="append" type="primary" @click="dialogVisible = true" style="color: #fff; background-color: #409eff; border-color: #409eff; border-radius: 0px">获取经纬度</el-button>
               </el-input>
             </el-form-item>
             <el-form-item label="联系人：" prop="contacts">
@@ -208,8 +202,10 @@ import { Point } from "ol/geom";
 import { Vector as VectorSource, OSM, XYZ, TileArcGISRest, TileWMS } from "ol/source";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer";
 import { click, pointerMove, altKeyOnly } from "ol/events/condition";
+import {  transform } from 'ol/proj'
 export default {
   name: "CompanyAdd",
+  components: {},
   data() {
     var checkEmail = (rule, value, callback) => {
       const mailReg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/;
@@ -292,7 +288,6 @@ export default {
         drawLayer: null,
       },
       selectedFeature: null,
-      //plot
       plotFunctions: null,
       Step: 1,
       firmData: {
@@ -421,11 +416,7 @@ export default {
         isNormalOperation: [{ required: true, message: "请选择设施是否正常运行", trigger: "blur" }],
         isStopUse: [{ required: true, message: "请选择是否停用", trigger: "blur" }],
       },
-    };
-  },
-  components: {},
-  mounted() {
-    this.initMap();
+    }
   },
   methods: {
     changeStep(step, type) {
@@ -448,28 +439,7 @@ export default {
           if (this.ZcData.contactPhone === "") {
             this.ZcData.contactPhone = this.firmData.contactsTel;
           }
-        } else if (step === 4) {
-          if (this.HxpData.contact === "") {
-            this.HxpData.contact = this.firmData.contacts;
-          }
-          if (this.HxpData.contactTel === "") {
-            this.HxpData.contactTel = this.firmData.contactsTel;
-          }
-        } else if (step === 5) {
-          if (this.ShljData.contact === "") {
-            this.ShljData.contact = this.firmData.contacts;
-          }
-          if (this.ShljData.contactTel === "") {
-            this.ShljData.contactTel = this.firmData.contactsTel;
-          }
-        } else if (step === 6) {
-          if (this.LsgData.contact === "") {
-            this.LsgData.contact = this.firmData.contacts;
-          }
-          if (this.LsgData.contactTel === "") {
-            this.LsgData.contactTel = this.firmData.contactsTel;
-          }
-        } else if (step === 7) {
+        }   else if (step === 7) {
           if (this.SyjData.contact === "") {
             this.SyjData.contact = this.firmData.contacts;
           }
@@ -481,14 +451,14 @@ export default {
     },
     //切换其他业务复选框
     changeqtyw(val) {
-      for (let j = 1; j < this.activitieList.length; j++) {
-        this.activitieList[j].type = "0";
-        for (let i = 0; i < script val.length; i++) {
-          if (val[i] === this.activitieList[j].value) {
-            this.activitieList[j].type = "1";
-          }
-        }
-      }
+      // for (let j = 1; j < this.activitieList.length; j++) {
+      //   this.activitieList[j].type = "0";
+      //   for (let i = 0; i <script val.length; i++) {
+      //     if (val[i] === this.activitieList[j].value) {
+      //       this.activitieList[j].type = "1";
+      //     }
+      //   }
+      // }
     },
     //获取当前点击【其他业务】复选框
     itemChange(val) {
@@ -578,7 +548,7 @@ export default {
           //XYZ地图
           new TileLayer({
             source: new XYZ({
-              // url: "http://t0.tianditu.com/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=469cfd9c133f30baaf3f94a9cd848c47",
+              url: "http://t0.tianditu.com/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=469cfd9c133f30baaf3f94a9cd848c47",
               crossOrigin: "anonymous",
             }),
           }),
@@ -615,12 +585,42 @@ export default {
           projection: "EPSG:4326",
         }),
       });
-      console.log("sdddd");
+      const clickSelect = new Select({
+        condition: click,
+        layers: [this.layers.pointLayer],
+      });
+      clickSelect.on("select", (e) => {
+        const features = e.selected;
+        console.log(1231231);
+        features.forEach((feature) => {
+          if (feature === this.selectedByAttriFeature) {
+            return;
+          }
+          this.onPointClick(feature, feature.getProperties().geometry.flatCoordinates);
+        });
+      });
+      clickSelect.on("deselect", (e) => {
+        console.log(e);
+      });
+      this.map.addInteraction(clickSelect);
       // //点击,使用箭头函数，让里面的this指向不改变
       // const clickSelect = new Select({
       //   condition: click,
       //   layers: [this.layers.pointLayer],
       // });
+//       this.map.on('singleclick', function(e){
+//       console.log(e.coordinate)
+//       console.log(transform(e.coordinate, 'EPSG:3857', 'EPSG:4326'));
+		
+// //         // 通过getEventCoordinate方法获取地理位置，再转换为wgs84坐标，并弹出对话框显示
+// 		// console.log(this.map.getEventCoordinate(e.originalEvent));
+// //         alert(ol.proj.transform(map.getEventCoordinate(e.originalEvent), 'EPSG:3857', 'EPSG:4326'));
+		
+// //         var lonlat = map.getCoordinateFromPixel(e.pixel);
+// // 		alert(lonlat);
+// //         alert(ol.proj.transform(lonlat,"EPSG:3857", "EPSG:4326"));
+//     })
+
       // clickSelect.on("select", (e) => {
       //   const features = e.selected;
       //   console.log(1231231);
@@ -637,9 +637,11 @@ export default {
       // this.map.addInteraction(clickSelect);
     },
   },
-
+ mounted() {
+    this.initMap();
+  },
 };
-</>
+</script>
 
 <style lang="scss">
 #map-address {

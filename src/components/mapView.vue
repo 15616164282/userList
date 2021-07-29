@@ -38,6 +38,9 @@
           </ul>
         </div>
       </div>
+      <div class="left-echarts">
+
+      </div>
     </div>
   </div>
 </template>
@@ -345,7 +348,8 @@ export default {
 <style scoped lang="scss">
 #map {
   width: 100%;
-  height: 900px;
+  height: calc(100vh - 60px);
+  position: relative;
 }
 .overlay-container {
   display: none;
@@ -365,7 +369,7 @@ export default {
 .ol-popup:before {
   top: 100%;
   border: solid transparent;
-  content: " ";
+  content: ' ';
   height: 0;
   width: 0;
   position: absolute;
@@ -443,5 +447,14 @@ export default {
       }
     }
   }
+}
+.left-echarts {
+  width: 450px;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 900;
+  background-color: #3393cf;
 }
 </style>
