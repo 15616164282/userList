@@ -106,13 +106,13 @@ export default {
           //XYZ地图
           new TileLayer({
             source: new XYZ({
-              url: "http://t0.tianditu.com/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=469cfd9c133f30baaf3f94a9cd848c47",
+              // url: "http://t0.tianditu.com/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=469cfd9c133f30baaf3f94a9cd848c47",
               crossOrigin: "anonymous",
             }),
           }),
           new TileLayer({
             source: new XYZ({
-              url: "http://t1.tianditu.com/DataServer?T=cia_w&x={x}&y={y}&l={z}&tk=469cfd9c133f30baaf3f94a9cd848c47",
+              // url: "http://t1.tianditu.com/DataServer?T=cia_w&x={x}&y={y}&l={z}&tk=469cfd9c133f30baaf3f94a9cd848c47",
               crossOrigin: "anonymous",
             }),
           }),
