@@ -64,7 +64,13 @@
             </el-form-item>
             <el-form-item label="设施纬度：" prop="equipment_longitude">
               <el-input v-model="firmData.equipment_latitude" disabled>
-                <el-button slot="append" type="primary" @click="dialogVisible = true" style="color: #fff; background-color: #409eff; border-color: #409eff; border-radius: 0px">获取经纬度</el-button>
+                <el-button
+                  slot="append"
+                  type="primary"
+                  @click="initMap()"
+                  style="color: #fff; background-color: #409eff; border-color: #409eff; border-radius: 0px"
+                  >获取经纬度</el-button
+                >
               </el-input>
             </el-form-item>
             <el-form-item label="联系人：" prop="contacts">
@@ -201,8 +207,9 @@ import { Map, Feature, View, Overlay } from "ol";
 import { Point } from "ol/geom";
 import { Vector as VectorSource, OSM, XYZ, TileArcGISRest, TileWMS } from "ol/source";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer";
+import { Circle, Fill, Stroke, Style, Text, Icon } from "ol/style";
 import { click, pointerMove, altKeyOnly } from "ol/events/condition";
-import {  transform } from 'ol/proj'
+import { transform } from "ol/proj";
 export default {
   name: "CompanyAdd",
   components: {},
@@ -281,12 +288,14 @@ export default {
       overlay: null,
       siteDesObj: {},
       overlayId: 1,
+      pointImage: require("../assets/point_normal.png"),
       layers: {
         pointLayer: null,
         riverLayer: null,
         contourLayer: null,
         drawLayer: null,
       },
+      olUid: 0,
       selectedFeature: null,
       plotFunctions: null,
       Step: 1,
@@ -294,6 +303,8 @@ export default {
         enterprise: [],
         contain_type: [],
         is_other_province: "",
+        equipment_longitude: "",
+        equipment_latitude: "",
       },
       PopData: {},
       ZcData: {},
@@ -416,7 +427,7 @@ export default {
         isNormalOperation: [{ required: true, message: "请选择设施是否正常运行", trigger: "blur" }],
         isStopUse: [{ required: true, message: "请选择是否停用", trigger: "blur" }],
       },
-    }
+    };
   },
   methods: {
     changeStep(step, type) {
@@ -439,7 +450,7 @@ export default {
           if (this.ZcData.contactPhone === "") {
             this.ZcData.contactPhone = this.firmData.contactsTel;
           }
-        }   else if (step === 7) {
+        } else if (step === 7) {
           if (this.SyjData.contact === "") {
             this.SyjData.contact = this.firmData.contacts;
           }
@@ -534,6 +545,7 @@ export default {
     },
     //初始化地图
     initMap() {
+      this.dialogVisible = true;
       this.map = new Map({
         //地图div id
         target: "map-address",
@@ -548,7 +560,7 @@ export default {
           //XYZ地图
           new TileLayer({
             source: new XYZ({
-              url: "http://t0.tianditu.com/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=469cfd9c133f30baaf3f94a9cd848c47",
+              // url: "http://t0.tianditu.com/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=469cfd9c133f30baaf3f94a9cd848c47",
               crossOrigin: "anonymous",
             }),
           }),
@@ -585,60 +597,60 @@ export default {
           projection: "EPSG:4326",
         }),
       });
-      const clickSelect = new Select({
-        condition: click,
-        layers: [this.layers.pointLayer],
+      // //添加点位图层
+      this.layers.pointLayer = new VectorLayer({
+        source: new VectorSource(),
+        //设置渲染方式
+        renderMode: "vector",
+        //渲染方式为"vector"时，图层可以在交互时渲染
+        updateWhileInteracting: true,
+        //渲染方式为"ventor"时，图层可以在移动时渲染，可以解决地图移动结束以后点位图标才改变的情况
+        updateWhileAnimating: true,
       });
-      clickSelect.on("select", (e) => {
-        const features = e.selected;
-        console.log(1231231);
-        features.forEach((feature) => {
-          if (feature === this.selectedByAttriFeature) {
-            return;
-          }
-          this.onPointClick(feature, feature.getProperties().geometry.flatCoordinates);
-        });
-      });
-      clickSelect.on("deselect", (e) => {
-        console.log(e);
-      });
-      this.map.addInteraction(clickSelect);
-      // //点击,使用箭头函数，让里面的this指向不改变
-      // const clickSelect = new Select({
-      //   condition: click,
-      //   layers: [this.layers.pointLayer],
-      // });
-//       this.map.on('singleclick', function(e){
-//       console.log(e.coordinate)
-//       console.log(transform(e.coordinate, 'EPSG:3857', 'EPSG:4326'));
-		
-// //         // 通过getEventCoordinate方法获取地理位置，再转换为wgs84坐标，并弹出对话框显示
-// 		// console.log(this.map.getEventCoordinate(e.originalEvent));
-// //         alert(ol.proj.transform(map.getEventCoordinate(e.originalEvent), 'EPSG:3857', 'EPSG:4326'));
-		
-// //         var lonlat = map.getCoordinateFromPixel(e.pixel);
-// // 		alert(lonlat);
-// //         alert(ol.proj.transform(lonlat,"EPSG:3857", "EPSG:4326"));
-//     })
+      this.map.addLayer(this.layers.pointLayer);
+      this.layers.pointLayer.setZIndex(0);
 
-      // clickSelect.on("select", (e) => {
-      //   const features = e.selected;
-      //   console.log(1231231);
-      //   // features.forEach((feature) => {
-      //   //   if (feature === this.selectedByAttriFeature) {
-      //   //     return;
-      //   //   }
-      //   //   this.onPointClick(feature, feature.getProperties().geometry.flatCoordinates);
-      //   // });
-      // });
-      // clickSelect.on("deselect", (e) => {
-      //   console.log(e);
-      // });
-      // this.map.addInteraction(clickSelect);
+      this.map.on("click", (e) => {
+        console.log(Math.round(e.coordinate[0] * 1000000) / 1000000);
+        let longitude = Math.round(e.coordinate[0] * 1000000) / 1000000;
+        let latitude = Math.round(e.coordinate[1] * 1000000) / 1000000;
+        this.addPoint(longitude, latitude);
+      });
+    },
+
+    //   // 添加点位数据
+    addPoint(x, y, attributes) {
+      let vectorSource = this.layers.pointLayer.getSource();
+      if (this.olUid > 0) {
+        vectorSource.removeFeature(vectorSource.getFeatureById(this.olUid));
+        this.olUid = this.olUid - 1;
+      }
+      const point = new Feature({
+        geometry: new Point([x, y]),
+        type: "point",
+      });
+      console.log(point);
+      point.setStyle(
+        new Style({
+          image: new Icon({
+            src: this.pointImage,
+            anchor: [0.5, 0.5], //锚点
+          }),
+          zIndex: 110,
+        })
+      );
+      // point.setProperties(attributes);
+      //设置点位id，这样可以用source.getFeatureById 找到
+      this.olUid = this.olUid + 1;
+      point.setId(this.olUid);
+      this.firmData.equipment_longitude = x;
+      this.firmData.equipment_latitude = y;
+      this.layers.pointLayer.getSource().addFeature(point);
+      console.log(this.layers.pointLayer);
     },
   },
- mounted() {
-    this.initMap();
+  mounted() {
+    // this.initMap();
   },
 };
 </script>

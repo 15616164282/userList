@@ -39,7 +39,27 @@
         </div>
       </div>
       <div class="left-echarts">
+        <div>
+          <div class="echarts-title">
+            <h4>有害垃圾总量变化趋势</h4>
+            <div style="width: 245px; display: flex; flex-direction: row; justify-content: space-between">
+              <el-select v-model="categoryValue" placeholder="请选择">
+                <el-option v-for="item in options" :key="item" :value="item"> </el-option>
+              </el-select>
+              <el-date-picker v-model="categoryYear" type="year" placeholder="选择年" style="width: 189px"> </el-date-picker>
+            </div>
+          </div>
+          <div id="category" class="category"></div>
+        </div>
+        <div>
+          <div class="echarts-title">
+            <h4>有害垃圾地区排放量统计</h4>
+            <el-date-picker v-model="categoryYear" type="year" placeholder="选择年" style="width: 109px"> </el-date-picker>
+          </div>
+          <div id="bar" class="bar"></div>
+        </div>
 
+        <div></div>
       </div>
     </div>
   </div>
@@ -61,11 +81,13 @@ import GeoJSON from "ol/format/GeoJSON.js";
 import EsriJSON from "ol/format/EsriJSON.js";
 import { easeOut } from "ol/easing";
 import { unByKey } from "ol/Observable";
-
+//echarts引用
+import * as echarts from "echarts";
 //模拟数据
 // import pljData from "../json/plj";
 // import contourData from "../json/contour";
 import pointsData from "../json/points.json";
+import company from "../json/company.json";
 export default {
   name: "mapView",
   data() {
@@ -89,10 +111,96 @@ export default {
       selectedFeature: null,
       //plot
       plotFunctions: null,
+      companyEcharts: company.echarts,
+      categoryYear: "2021",
+      categoryValue: "全部",
+      options: {},
     };
   },
   components: {},
   methods: {
+    getArrayProps(array, key) {
+      var key = key || "value";
+      var res = [];
+      if (array) {
+        array.forEach(function (t) {
+          res.push(t[key]);
+        });
+      }
+      return res;
+    },
+    initChart1() {
+      let myChart = echarts.init(document.getElementById("category"));
+      myChart.setOption(
+        {
+          xAxis: {
+            type: "category",
+            // data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            data: this.getArrayProps(this.companyEcharts, "name"),
+          },
+          yAxis: {
+            type: "value",
+          },
+          series: [
+            {
+              // data: [820, 932, 901, 934, 1290, 1330, 1320],
+              data: this.getArrayProps(this.companyEcharts, "value"),
+              type: "line",
+              smooth: true,
+            },
+          ],
+        },
+        true
+      );
+    },
+    initChart2() {
+      let myChart = echarts.init(document.getElementById("bar"));
+      myChart.setOption(
+        {
+          tooltip: {
+            trigger: "axis",
+            axisPointer: {
+              // 坐标轴指示器，坐标轴触发有效
+              type: "shadow", // 默认为直线，可选为：'line' | 'shadow'
+            },
+          },
+          grid: {
+            left: "3%",
+            right: "4%",
+            bottom: "3%",
+            containLabel: true,
+          },
+          xAxis: [
+            {
+              type: "category",
+              data: this.getArrayProps(this.companyEcharts, "name"),
+              axisTick: {
+                alignWithLabel: true,
+              },
+            },
+          ],
+          yAxis: [
+            {
+              type: "value",
+              scale: true,
+              max: 100,
+              min: 0,
+              splitNumber: 10,
+              boundaryGap: [0.2, 0.2],
+            },
+          ],
+          series: [
+            {
+              name: "",
+              type: "bar",
+              barWidth: "60%",
+              data: this.getArrayProps(this.companyEcharts, "value"),
+            },
+          ],
+        },
+        true
+      );
+    },
     //初始化地图
     initMap() {
       this.map = new Map({
@@ -109,13 +217,13 @@ export default {
           //XYZ地图
           new TileLayer({
             source: new XYZ({
-              // url: "http://t0.tianditu.com/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=469cfd9c133f30baaf3f94a9cd848c47",
+              url: "http://t0.tianditu.com/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=469cfd9c133f30baaf3f94a9cd848c47",
               crossOrigin: "anonymous",
             }),
           }),
           new TileLayer({
             source: new XYZ({
-              // url: "http://t1.tianditu.com/DataServer?T=cia_w&x={x}&y={y}&l={z}&tk=469cfd9c133f30baaf3f94a9cd848c47",
+              url: "http://t1.tianditu.com/DataServer?T=cia_w&x={x}&y={y}&l={z}&tk=469cfd9c133f30baaf3f94a9cd848c47",
               crossOrigin: "anonymous",
             }),
           }),
@@ -180,7 +288,6 @@ export default {
       });
       clickSelect.on("select", (e) => {
         const features = e.selected;
-        console.log(1231231);
         features.forEach((feature) => {
           if (feature === this.selectedByAttriFeature) {
             return;
@@ -188,9 +295,7 @@ export default {
           this.onPointClick(feature, feature.getProperties().geometry.flatCoordinates);
         });
       });
-      clickSelect.on("deselect", (e) => {
-        console.log(e);
-      });
+      clickSelect.on("deselect", (e) => {});
       this.map.addInteraction(clickSelect);
     },
     // 添加点位数据
@@ -217,7 +322,6 @@ export default {
     //点位数据加载
     onButton1Click() {
       pointsData.forEach((point) => {
-        console.log(point);
         this.addPoint(point.longitude, point.latitude, {
           name: point.slagName,
           id: point.id,
@@ -281,6 +385,7 @@ export default {
     },
     //点位点击事件
     onPointClick(feature) {
+      console.log(feature);
       const attributes = feature.getProperties();
       console.log(attributes);
       //信息窗
@@ -341,6 +446,8 @@ export default {
   mounted() {
     this.initMap();
     this.onButton1Click();
+    this.initChart1();
+    this.initChart2();
   },
 };
 </script>
@@ -369,7 +476,7 @@ export default {
 .ol-popup:before {
   top: 100%;
   border: solid transparent;
-  content: ' ';
+  content: " ";
   height: 0;
   width: 0;
   position: absolute;
@@ -453,8 +560,36 @@ export default {
   height: 100%;
   position: absolute;
   top: 0;
-  left: 0;
+  left: 5px;
   z-index: 900;
-  background-color: #3393cf;
+  // background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  .echarts-title {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    h4 {
+      width: 200px;
+      height: 40px;
+      padding: 0 10px;
+      margin-right: 5px;
+      background: url("../assets/images/title-bj.png") no-repeat;
+      background-size: 100% 100%;
+    }
+  }
+  .category,
+  .bar {
+    width: 100%;
+    height: 270px;
+  }
+  > div:nth-child(-n + 2) {
+    width: 100%;
+    height: calc(100% / 3);
+    margin-bottom: 5px;
+    background: url("../assets/images/bj.png") no-repeat;
+    background-size: 100% 100%;
+  }
 }
 </style>

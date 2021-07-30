@@ -18,26 +18,32 @@ const routes = [
         path: "/UserInfor",
         name: "UserInfor",
         component: () => import("../views/UserInfor.vue"),
+        meta: { title: "个人信息", breadcrumb: ["个人信息"] },
       }, {
         path: "/UserExper",
         name: "UserExper",
         component: () => import("../views/UserExper.vue"),
+        meta: { title: "个人经历", breadcrumb: ["个人经历"] },
       }, {
         path: "/UserEchart",
         name: "UserEchart",
         component: () => import("../views/UserEchart.vue"),
+        meta: { title: "echarts", breadcrumb: ["echarts图表"] },
       }, {
         path: "/CompanyAdd",
         name: "CompanyAdd",
         component: () => import("../views/CompanyAdd.vue"),
+        meta: { title: "新增企业", breadcrumb: ["新增企业"] },
       }, {
         path: "/CompanyManag",
         name: "CompanyManag",
         component: () => import("../views/CompanyManag.vue"),
+        meta: { title: "企业管理", breadcrumb: ["企业管理"] },
       }, {
         path: "/map",
         name: "map",
         component: () => import("../views/map.vue"),
+        meta: { title: "openlayers", breadcrumb: ["openlayers"] },
       },
     ]
   },

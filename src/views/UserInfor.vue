@@ -1,6 +1,6 @@
 <template>
   <div class="userinfor">
-    <h3 style="text-align: center; line-height: 25px">个人信息</h3>
+    <!-- <h3 style="text-align: center; line-height: 25px">个人信息</h3> -->
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="110px" class="demo-ruleForm">
       <el-form-item label="姓名：" prop="name" class="small">
         <el-input v-model="ruleForm.name" clearable></el-input>
@@ -109,12 +109,11 @@
           </el-form-item>
         </el-col>
       </el-form-item>
-
-      <el-form-item>
-        <el-button type="primary" @click="submitForm('ruleForm')">立即提交</el-button>
-        <el-button @click="resetForm('ruleForm')">重置</el-button>
-      </el-form-item>
     </el-form>
+    <div style="margin: 0 auto">
+      <el-button type="primary" @click="submitForm('ruleForm')">立即提交</el-button>
+      <el-button @click="resetForm('ruleForm')">重置</el-button>
+    </div>
   </div>
 </template>
 
@@ -331,58 +330,64 @@ export default {
 </script>
 
 <style lang="scss">
-.address {
-  textarea {
-    min-height: 40px !important;
-    height: 40px !important;
+.userinfor {
+  .address {
+    textarea {
+      width: 162%;
+      min-height: 40px !important;
+      height: 40px !important;
+    }
+  }
+  // .small-select-ads {
+  //   width: 100%;
+  // }
+  // .small-select {
+  //   width: 35%;
+  // }
+  // .small {
+  //   width: 25%;
+  // }
+  .userinfor {
+    padding-left: 10px;
+  }
+  .demo-ruleForm {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9 !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409eff;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 120px;
+    height: 120px;
+    line-height: 120px;
+    text-align: center;
+  }
+  .avatar {
+    width: 120px;
+    height: 120px;
+    display: block;
   }
 }
-.small-select-ads {
-  width: 100%;
-}
-.small-select {
-  width: 35%;
-}
-.small {
-  width: 25%;
-}
-.userinfor {
-  padding-left: 10px;
-}
-.demo-ruleForm {
-  width: 80%;
-}
-.avatar-uploader .el-upload {
-  border: 1px dashed #d9d9d9 !important;
-  border-radius: 6px !important;
-  cursor: pointer !important;
-  position: relative !important;
-  overflow: hidden !important;
-}
-.avatar-uploader .el-upload:hover {
-  border-color: #409eff;
-}
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 120px;
-  height: 120px;
-  line-height: 120px;
-  text-align: center;
-}
-.avatar {
-  width: 120px;
-  height: 120px;
-  display: block;
-}
 
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none !important;
-}
-/* chrome */
+// input::-webkit-outer-spin-button,
+// input::-webkit-inner-spin-button {
+//   -webkit-appearance: none !important;
+// }
+// /* chrome */
 
-input[type="number"] {
-  -moz-appearance: textfield; /* firefox */
-}
+// input[type="number"] {
+//   -moz-appearance: textfield; /* firefox */
+// }
 </style>
