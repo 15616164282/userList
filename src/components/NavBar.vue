@@ -9,16 +9,17 @@
     </div>
     <div class="tag-box">
       <el-tag
-        v-for="tag in tags"
-        :key="tag.name"
+        v-for="(tag, i) in tags"
+        :key="i"
         size="small"
         :closable="true"
         type="success"
         class="tag-view"
-        effect="dark "
+        :effect="isActive(tag) ? 'dark' : ''"
         :disable-transitions="true"
         :hit="true"
-        @close="closeTag(tag)"
+        @close="closeTag(tag, i)"
+        @click="$router.push(tag.path)"
       >
         {{ tag.meta.title }}
       </el-tag>
@@ -40,22 +41,16 @@ export default {
   watch: {
     $route: {
       handler(newRouter) {
-        console.log(newRouter);
-        // this.tags.push(newRouter);
-        // this.tags = this.deleteobj(newRouter);
-        // this.tags = this.tags.filter((o) => o.name != newRouter.name);
-        if (this.tags.length == 0) {
-          console.log("aaaa");
+        if (this.tags.length === 0) {
           this.tags.push(newRouter);
         } else {
-          console.log("bbb");
-          // let tagsView = this.tags.filter((o) => o.name != newRouter.name);
-          this.tags.forEach((item) => {
-            if (item.name !== newRouter.name) {
-              console.log("wwww");
-              this.tags.push(newRouter);
+          let a = true;
+          for (let i = 0; i < this.tags.length; i++) {
+            if (this.tags[i].name == newRouter.name) {
+              a = false;
             }
-          });
+          }
+          a ? this.tags.push(newRouter) : "";
         }
         this.breadcrumb = newRouter.meta.breadcrumb;
       },
@@ -64,51 +59,20 @@ export default {
   },
   components: {},
   methods: {
-    deleteobj(obj) {
-      var uniques = [];
-      var stringify = {};
-      for (var i = 0; i < obj.length; i++) {
-        var keys = Object.keys(obj[i]);
-        keys.sort(function (a, b) {
-          return Number(a) - Number(b);
-        });
-        var str = "";
-        for (var j = 0; j < keys.length; j++) {
-          str += JSON.stringify(keys[j]);
-          str += JSON.stringify(obj[i][keys[j]]);
-        }
-        if (!stringify.hasOwnProperty(str)) {
-          uniques.push(obj[i]);
-          stringify[str] = true;
-        }
-      }
-      uniques = uniques;
-      return uniques;
-    },
     //关闭标签窗口
-    closeTag(val) {
-      console.log(val);
-      this.tags = this.tags.filter((o) => o != val);
-      const latestView = this.tags.slice(-1)[0];
-      console.log(latestView);
-      if (latestView) {
-        this.$router.push(latestView.fullPath);
-      } else {
-        // now the default is to redirect to the home page if there is no tags-view,
-        // you can adjust it according to your needs.
-        // if (view.name === "Dashboard") {
-        //   // to reload home page
-        //   this.$router.replace({ path: "/redirect" + view.fullPath });
-        // } else {
-        //
-        // }
-        this.$router.push("/");
-      }
+    closeTag(tag, i) {
+      this.tags = this.tags.filter((o) => o != tag);
+      const latestView = this.tags.slice(i)[0];
+      latestView != undefined ? this.$router.push(latestView.fullPath) : this.$router.push("/");
     },
     //监听展开还是收缩
     collapse() {
       this.flag = !this.flag;
       Bus.$emit("collapse", this.flag);
+    },
+
+    isActive(tag) {
+      return tag.path == this.$route.path;
     },
   },
 };
@@ -142,6 +106,11 @@ export default {
   border-top: 2px solid #d8dce5;
   .tag-view {
     margin-left: 3px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
 }
 </style>
