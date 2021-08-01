@@ -40,75 +40,64 @@
         </el-date-picker>
       </el-form-item>
 
-      <el-form-item label="家庭住址：" required>
-        <el-col :span="7">
-          <el-form-item prop="address">
-            <el-cascader
-              size="large"
-              placeholder="请选择地址"
-              :options="areaData"
-              v-model="ruleForm.address"
-              @change="handleChange"
-              class="small-select-ads"
-              clearable
-            >
-            </el-cascader>
-          </el-form-item>
-        </el-col>
-        <el-col :span="10">
-          <el-form-item label="详细地址：" prop="addressArea">
-            <el-input type="textarea" placeholder="请填写详细地址" v-model="ruleForm.addressArea" :autosize="true" class="address" clearable>
-            </el-input>
-          </el-form-item>
-        </el-col>
+      <!-- <el-form-item label="家庭住址：" required> -->
+      <!-- <el-col :span="18"> -->
+      <el-form-item prop="address" label="家庭住址：">
+        <el-cascader
+          size="large"
+          placeholder="请选择地址"
+          :options="areaData"
+          v-model="ruleForm.address"
+          @change="handleChange"
+          class="small-select-ads"
+          clearable
+        >
+        </el-cascader>
       </el-form-item>
+      <!-- </el-col> -->
+      <el-form-item label="详细地址：" prop="addressArea">
+        <el-input type="textarea" placeholder="请填写详细地址" v-model="ruleForm.addressArea" :autosize="true" class="address" clearable> </el-input>
+      </el-form-item>
+      <!-- </el-form-item> -->
 
-      <el-form-item label="最高学历：" required>
-        <el-col :span="4">
-          <el-form-item prop="education">
-            <el-select v-model="ruleForm.education" placeholder="请选择最高学历">
-              <el-option v-for="item in education" :key="item" :value="item"> </el-option>
-            </el-select>
-          </el-form-item>
-        </el-col>
-        <el-col :span="6">
-          <el-form-item label="开始日期：" prop="eduStartTime">
-            <el-date-picker
-              type="date"
-              placeholder="选择开始日期"
-              :picker-options="pickerOptionsStart"
-              v-model="ruleForm.eduStartTime"
-              style="width: 100%"
-            ></el-date-picker>
-          </el-form-item>
-        </el-col>
-        <el-col :span="6">
-          <el-form-item label="结束日期：" prop="eduEndTime">
-            <el-date-picker
-              type="date"
-              placeholder="选择结束日期"
-              :picker-options="pickerOptionsEnd"
-              v-model="ruleForm.eduEndTime"
-              style="width: 100%"
-            ></el-date-picker>
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="照片：" prop="coverFile">
-            <el-upload
-              class="avatar-uploader"
-              action="https://jsonplaceholder.typicode.com/posts/"
-              :show-file-list="false"
-              :before-upload="beforeAvatarUpload"
-              v-model="ruleForm.coverFile"
-              :multiple="false"
-            >
-              <img v-if="ruleForm.coverUrl" :src="ruleForm.coverUrl" class="avatar" />
-              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-            </el-upload>
-          </el-form-item>
-        </el-col>
+      <!-- <el-form-item label="最高学历：" required> -->
+      <el-form-item prop="education" label="最高学历：">
+        <el-select v-model="ruleForm.education" placeholder="请选择最高学历">
+          <el-option v-for="item in education" :key="item" :value="item"> </el-option>
+        </el-select>
       </el-form-item>
+      <el-form-item label="开始日期：" prop="eduStartTime">
+        <el-date-picker
+          type="date"
+          placeholder="选择开始日期"
+          :picker-options="pickerOptionsStart"
+          v-model="ruleForm.eduStartTime"
+          style="width: 100%"
+        ></el-date-picker>
+      </el-form-item>
+      <el-form-item label="结束日期：" prop="eduEndTime">
+        <el-date-picker
+          type="date"
+          placeholder="选择结束日期"
+          :picker-options="pickerOptionsEnd"
+          v-model="ruleForm.eduEndTime"
+          style="width: 100%"
+        ></el-date-picker>
+      </el-form-item>
+      <el-form-item label="照片：" prop="coverFile">
+        <el-upload
+          class="avatar-uploader"
+          action="https://jsonplaceholder.typicode.com/posts/"
+          :show-file-list="false"
+          :before-upload="beforeAvatarUpload"
+          v-model="ruleForm.coverFile"
+          :multiple="false"
+        >
+          <img v-if="ruleForm.coverUrl" :src="ruleForm.coverUrl" class="avatar" />
+          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+        </el-upload>
+      </el-form-item>
+      <!-- </el-form-item> -->
     </el-form>
     <div style="margin: 0 auto">
       <el-button type="primary" @click="submitForm('ruleForm')">立即提交</el-button>
@@ -331,22 +320,9 @@ export default {
 
 <style lang="scss">
 .userinfor {
-  .address {
-    textarea {
-      width: 162%;
-      min-height: 40px !important;
-      height: 40px !important;
-    }
+  .el-form-item {
+    width: 25%;
   }
-  // .small-select-ads {
-  //   width: 100%;
-  // }
-  // .small-select {
-  //   width: 35%;
-  // }
-  // .small {
-  //   width: 25%;
-  // }
   .userinfor {
     padding-left: 10px;
   }
@@ -380,14 +356,13 @@ export default {
     display: block;
   }
 }
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+}
+/* chrome */
 
-// input::-webkit-outer-spin-button,
-// input::-webkit-inner-spin-button {
-//   -webkit-appearance: none !important;
-// }
-// /* chrome */
-
-// input[type="number"] {
-//   -moz-appearance: textfield; /* firefox */
-// }
+input[type="number"] {
+  -moz-appearance: textfield; /* firefox */
+}
 </style>

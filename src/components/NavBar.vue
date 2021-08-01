@@ -15,7 +15,7 @@
         :closable="true"
         type="success"
         class="tag-view"
-        :effect="isActive(tag) ? 'dark' : ''"
+        :effect="isActive(tag) ? 'dark' : 'plain'"
         :disable-transitions="true"
         :hit="true"
         @close="closeTag(tag, i)"
@@ -33,7 +33,7 @@ export default {
   name: "NavBar",
   data() {
     return {
-      flag: false,
+      flag: true,
       breadcrumb: [],
       tags: [],
     };
@@ -100,10 +100,11 @@ export default {
   width: 100%;
   height: 30px;
   padding: 3px 0;
-  margin-bottom: 10px;
+  // margin-bottom: 10px;
+  line-height: 30px;
   background-color: #fff;
-  border-bottom: 1px solid #d8dce5;
-  border-top: 2px solid #d8dce5;
+  border-bottom: 2px solid #d8dce5;
+  border-top: 1px solid #d8dce5;
   .tag-view {
     margin-left: 3px;
     cursor: pointer;

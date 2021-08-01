@@ -1,5 +1,5 @@
 <template>
-  <div class="" style="display: flex">
+  <div class="companyAdd" style="display: flex">
     <div style="width: 12%; border-right: 1px solid #eee; padding: 1px 20px; margin-top: 30px">
       <el-timeline>
         <el-timeline-item v-for="(activity, index) in activitieList" :key="index" size="normal" @click.native="changeStep(index + 1, activity.type)">
@@ -191,9 +191,7 @@
           <el-button type="primary" @click="dialogVisible = false">返回</el-button>
         </div>
       </div>
-      <div class="map-box">
-        <div id="map-address"></div>
-      </div>
+      <div id="map-address"></div>
     </div>
     <div class="modal" v-show="dialogVisible"></div>
   </div>
@@ -560,13 +558,13 @@ export default {
           //XYZ地图
           new TileLayer({
             source: new XYZ({
-              // url: "http://t0.tianditu.com/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=469cfd9c133f30baaf3f94a9cd848c47",
+              url: "http://t0.tianditu.com/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=469cfd9c133f30baaf3f94a9cd848c47",
               crossOrigin: "anonymous",
             }),
           }),
           new TileLayer({
             source: new XYZ({
-              // url: "http://t1.tianditu.com/DataServer?T=cia_w&x={x}&y={y}&l={z}&tk=469cfd9c133f30baaf3f94a9cd848c47",
+              url: "http://t1.tianditu.com/DataServer?T=cia_w&x={x}&y={y}&l={z}&tk=469cfd9c133f30baaf3f94a9cd848c47",
               crossOrigin: "anonymous",
             }),
           }),
@@ -609,7 +607,6 @@ export default {
       });
       this.map.addLayer(this.layers.pointLayer);
       this.layers.pointLayer.setZIndex(0);
-
       this.map.on("click", (e) => {
         console.log(Math.round(e.coordinate[0] * 1000000) / 1000000);
         let longitude = Math.round(e.coordinate[0] * 1000000) / 1000000;
@@ -629,7 +626,6 @@ export default {
         geometry: new Point([x, y]),
         type: "point",
       });
-      console.log(point);
       point.setStyle(
         new Style({
           image: new Icon({
@@ -646,7 +642,6 @@ export default {
       this.firmData.equipment_longitude = x;
       this.firmData.equipment_latitude = y;
       this.layers.pointLayer.getSource().addFeature(point);
-      console.log(this.layers.pointLayer);
     },
   },
   mounted() {
@@ -656,151 +651,144 @@ export default {
 </script>
 
 <style lang="scss">
-#map-address {
-  width: 100%;
-  height: 100%;
-}
-.el-timeline-item__dot {
-  left: -9px;
-}
-.el-timeline-item__tail {
-  border-left: 1px dashed #ddd;
-}
-.el-timeline-item__content {
-  line-height: 33px;
-  p {
+.companyAdd {
+  #map-address {
+    // position: relative;
+    width: 100%;
+    height: 640px;
+  }
+  .el-timeline-item__dot {
+    left: -9px;
+  }
+  .el-timeline-item__tail {
+    border-left: 1px dashed #ddd;
+  }
+  .el-timeline-item__content {
+    line-height: 33px;
+    p {
+      font-size: 16px;
+    }
+  }
+  .checkName {
+    color: #24a3e6;
+  }
+  .uncheckName {
+    color: #666;
+  }
+  .checkTimeIndex {
+    border: 2px solid #24a3e6;
+    color: #24a3e6;
+  }
+  .unchecktimeIndex {
+    border: 2px solid #666;
+    color: #666;
+  }
+  .checkTimeIndex,
+  .unchecktimeIndex {
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    line-height: 26px;
+    text-align: center;
+    background: #fff;
     font-size: 16px;
   }
-}
-.checkName {
-  color: #24a3e6;
-}
-.uncheckName {
-  color: #666;
-}
-.checkTimeIndex {
-  border: 2px solid #24a3e6;
-  color: #24a3e6;
-}
-.unchecktimeIndex {
-  border: 2px solid #666;
-  color: #666;
-}
-.checkTimeIndex,
-.unchecktimeIndex {
-  border-radius: 50%;
-  width: 26px;
-  height: 26px;
-  line-height: 26px;
-  text-align: center;
-  background: #fff;
-  font-size: 16px;
-}
-.wordTips {
-  width: 100% !important;
-  margin: 20px 20px;
-  background: inherit;
-  background-color: rgba(225, 245, 255, 1);
-  box-sizing: border-box;
-  border-width: 1px;
-  border-style: solid;
-  border-color: rgba(199, 235, 246, 1);
-  border-radius: 4px;
-  -moz-box-shadow: none;
-  -webkit-box-shadow: none;
-  box-shadow: none;
-  > p {
-    color: #3393cf;
-    font-size: 14px;
-    padding: 5px 20px;
+  .wordTips {
+    width: 100% !important;
+    margin: 20px 20px;
+    background: inherit;
+    background-color: rgba(225, 245, 255, 1);
+    box-sizing: border-box;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgba(199, 235, 246, 1);
+    border-radius: 4px;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    > p {
+      color: #3393cf;
+      font-size: 14px;
+      padding: 5px 20px;
+    }
   }
-}
-.el-form-item {
-  display: inline-block;
-  width: 50%;
-}
+  .el-form-item {
+    display: inline-block;
+    width: 50%;
+  }
 
-.win-page-box {
-  /* margin: 0 -20px;
+  .win-page-box {
+    /* margin: 0 -20px;
         padding-left: 20px;*/
-  height: 100%;
-  /* position: absolute;*/
-  bottom: 0;
+    height: 100%;
+    /* position: absolute;*/
+    bottom: 0;
 
-  > div {
-    display: flex;
-    flex-wrap: wrap;
-
-    justify-content: left;
-
-    margin-bottom: 56px;
     > div {
-      width: 50%;
+      display: flex;
+      flex-wrap: wrap;
+
+      justify-content: left;
+
+      margin-bottom: 56px;
+      > div {
+        width: 50%;
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: left;
+        margin: 10px 20px;
+
+        > div:nth-of-type(1) {
+          padding-right: 20px;
+          width: 200px;
+          text-align: right;
+          line-height: 40px;
+        }
+
+        > div:nth-of-type(2) {
+          width: calc(100% - 250px);
+        }
+      }
+    }
+  }
+
+  .submitBtn {
+    padding-bottom: 10px;
+    position: fixed;
+    bottom: 0;
+    right: 0.8%;
+    left: 13.8%;
+    background: white;
+    padding-top: 6px;
+    z-index: 1;
+    display: flex;
+    justify-content: center !important;
+  }
+  .map-show-box {
+    position: fixed;
+    z-index: 999;
+    top: 160px;
+    left: 280px;
+    width: calc(100vw - 400px);
+    // height: 700px;
+    overflow: auto;
+    margin: 0;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+
+    .map-tit {
       display: flex;
       flex-wrap: nowrap;
-      justify-content: left;
-      margin: 10px 20px;
+      justify-content: space-between;
+      padding: 0 20px;
+      height: 60px;
+      line-height: 60px;
 
-      > div:nth-of-type(1) {
-        padding-right: 20px;
-        width: 200px;
-        text-align: right;
-        line-height: 40px;
-      }
-
-      > div:nth-of-type(2) {
-        width: calc(100% - 250px);
+      .map-tit-txt {
+        display: flex;
+        justify-content: flex-start;
       }
     }
-  }
-}
-.form-box {
-  // display: flex;
-  //         flex-wrap: wrap;
-  //         justify-content: left;
-}
-.submitBtn {
-  padding-bottom: 10px;
-  position: fixed;
-  bottom: 0;
-  right: 0.8%;
-  left: 13.8%;
-  background: white;
-  padding-top: 6px;
-  z-index: 1;
-  display: flex;
-  justify-content: center !important;
-}
-.map-show-box {
-  position: fixed;
-  z-index: 999;
-  top: 180px;
-  left: 280px;
-  width: calc(100vw - 400px);
-  height: 700px;
-  overflow: auto;
-  margin: 0;
-  background-color: #ffffff;
-  border: 1px solid #cccccc;
-
-  .map-tit {
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    padding: 0 20px;
-    height: 60px;
-    line-height: 60px;
-
-    .map-tit-txt {
-      display: flex;
-      justify-content: flex-start;
-    }
-  }
-
-  .map-box {
-    position: relative;
-    width: 100%;
-    height: 90%;
 
     /deep/ .amap-logo {
       display: none !important;
@@ -818,14 +806,14 @@ export default {
       pointer-events: none;
     }
   }
-}
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(51, 48, 47, 0.5);
-  z-index: 900;
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(51, 48, 47, 0.5);
+    z-index: 900;
+  }
 }
 </style>

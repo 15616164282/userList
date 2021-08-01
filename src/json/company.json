@@ -143,5 +143,45 @@
     "zipCode": "550509",
     "zzjgdmz": null
   },
-  "echarts":[{"value":123,"name":"跳舞"},{"value":23,"name":"唱歌"},{"value":25,"name":"滑滑板"},{"value":79,"name":"篮球"},{"value":45,"name":"看书"}]
+  "echarts": {
+    "barData": [{
+      "value": 123,
+      "name": "贵阳市"
+    }, {
+      "value": 23,
+      "name": "遵义市"
+    }, {
+      "value": 25,
+      "name": "六盘水市"
+    }, {
+      "value": 79,
+      "name": "安顺市"
+    }, {
+      "value": 45,
+      "name": "毕节市"
+    }, {
+      "value": 37,
+      "name": "钢仁市"
+    }],
+    "echartLegend": ["二噁英"],
+    "categoryData": [{
+      "value": 123,
+      "name": "2020-01"
+    }, {
+      "value": 23,
+      "name": "2020-03"
+    }, {
+      "value": 25,
+      "name": "2020-05"
+    }, {
+      "value": 79,
+      "name": "2020-07"
+    }, {
+      "value": 45,
+      "name": "2020-09"
+    }, {
+      "value": 37,
+      "name": "2020-11"
+    }]
+  }
 }

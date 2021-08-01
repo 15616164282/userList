@@ -1,5 +1,5 @@
 <template>
-  <div class="">
+  <div class="userHome">
     <el-row type="flex">
       <el-menu
         :default-active="$router.currentRoute.path"
@@ -9,34 +9,18 @@
         active-text-color="#ffd04b"
         :collapse="isCollapse"
         :router="true"
-        :unique-opened="true"
+        :unique-opened="false"
       >
-        <el-submenu :index="i" v-for="(item, i) in menu" :key="i">
+        <el-submenu :index="item.path" v-for="(item, i) in menu" :key="i">
           <template slot="title">
-            <i class="el-icon-location"></i>
+            <i :class="item.ico"></i>
             <span slot="title">{{ item.name }}</span>
           </template>
           <el-menu-item :index="item.path" v-for="(item, index) in menu[i].child" :key="index">
             <i :class="item.ico"></i>
             <span slot="title">{{ item.name }}</span>
           </el-menu-item>
-          <!-- <el-menu-item-group>
-            <span slot="title">分组一</span>
-            <el-menu-item index="1-1">选项1</el-menu-item>
-            <el-menu-item index="1-2">选项2</el-menu-item>
-          </el-menu-item-group>
-          <el-menu-item-group title="分组2">
-            <el-menu-item index="1-3">选项3</el-menu-item>
-          </el-menu-item-group>
-          <el-submenu index="1-4">
-            <span slot="title">选项4</span>
-            <el-menu-item index="1-4-1">选项1</el-menu-item>
-          </el-submenu> -->
         </el-submenu>
-        <!-- <el-menu-item v-for="item in menu" :key="item" :index="item.path">
-          <i :class="item.ico"></i>
-          <span slot="title">{{ item.name }}</span>
-        </el-menu-item> -->
       </el-menu>
       <el-col :span="24" style="padding-left: 10px; padding-top: 10px">
         <Navbar></Navbar>
@@ -58,10 +42,10 @@ export default {
   },
   data() {
     return {
-      isCollapse: false,
+      isCollapse: true,
       menu: [
         {
-          path: "",
+          path: "task1",
           name: "任务一",
           ico: "el-icon-setting",
           child: [
@@ -71,11 +55,11 @@ export default {
           ],
         },
         {
-          path: "",
+          path: "task2",
           name: "任务二",
           ico: "el-icon-setting",
           child: [
-            { path: "/CompanyAdd", name: "新增企业", ico: "" },
+            { path: "/CompanyAdd", name: "新增企业", ico: "el-icon-circle-plus" },
             { path: "/CompanyManag", name: "企业注册管理", ico: "el-icon-office-building" },
             { path: "/map", name: "map地图", ico: "el-icon-map-location" },
           ],
@@ -94,13 +78,15 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.el-menu-vertical-demo {
-  text-align: center;
-  height: 100vh;
-  i {
-    color: #fff;
+.userHome {
+  .el-menu-vertical-demo {
+    // text-align: center;
+    i {
+      color: #fff;
+    }
   }
 }
+
 .el-menu-vertical-demo:not(.el-menu--collapse) {
   width: 260px;
 }

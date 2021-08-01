@@ -7,7 +7,7 @@
       <el-row type="flex" justify="space-between">
         <el-col :span="5">
           <el-form-item label="姓名：">
-            <el-input v-model="queryForm.name" clearable @blur="query"></el-input>
+            <el-input v-model="queryForm.name" clearable @blur="query" size="small"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="6">
@@ -19,6 +19,7 @@
               placeholder="选择日期"
               value-format="yyyy-MM-dd"
               @change="query"
+              size="small"
             >
             </el-date-picker>
           </el-form-item>
@@ -32,26 +33,27 @@
               placeholder="选择日期"
               value-format="yyyy-MM-dd"
               @change="query"
+              size="small"
             >
             </el-date-picker>
           </el-form-item>
         </el-col>
         <el-col :span="5" v-if="workStudy">
           <el-form-item label="职位：">
-            <el-input v-model="queryForm.position" clearable @blur="query"></el-input>
+            <el-input v-model="queryForm.position" clearable @blur="query" size="small"></el-input>
           </el-form-item>
         </el-col>
 
         <el-col :span="4" v-else>
           <el-form-item label="学历：">
-            <el-select v-model="queryForm.position" clearable placeholder="请选择学历" @change="query">
+            <el-select v-model="queryForm.position" clearable placeholder="请选择学历" @change="query" size="small">
               <el-option v-for="item in education" :key="item" :label="item" :value="item"> </el-option>
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="4">
           <el-form-item label="爱好：" v-if="workStudy == false">
-            <el-input v-model="queryForm.hobby" clearable @blur="query"></el-input>
+            <el-input v-model="queryForm.hobby" clearable @blur="query" size="small"></el-input>
           </el-form-item>
         </el-col>
       </el-row>
@@ -338,9 +340,9 @@ export default {
 .UserExper {
   width: 63%;
   margin: 10px auto;
-}
-.el-date-editor.el-input,
-.el-date-editor.el-input__inner {
-  width: 100%;
+  .el-date-editor.el-input,
+  .el-date-editor.el-input__inner {
+    width: 100%;
+  }
 }
 </style>

@@ -12,10 +12,10 @@
           <ul>
             <li style="width: 100%">
               所属管控单元：
-              <span @click="showGkdyDetail(siteDesObj)" class="gkdymc" :style="zoneLevelColor">{{ siteDesObj.hjgkdymc }}</span>
+              <span class="gkdymc">{{ siteDesObj.hjgkdymc }}</span>
             </li>
             <li style="width: 100%">
-              风险源级别：<span @click="showFxy(siteDesObj)" class="gkdymc">{{ siteDesObj.risk_grade }}</span>
+              风险源级别：<span class="gkdymc">{{ siteDesObj.risk_grade }}</span>
             </li>
             <li style="width: 100%">
               地址：<span>{{ siteDesObj.address }}</span>
@@ -43,10 +43,10 @@
           <div class="echarts-title">
             <h4>有害垃圾总量变化趋势</h4>
             <div style="width: 245px; display: flex; flex-direction: row; justify-content: space-between">
-              <el-select v-model="categoryValue" placeholder="请选择">
+              <el-select v-model="categoryValue" placeholder="请选择" size="small">
                 <el-option v-for="item in options" :key="item" :value="item"> </el-option>
               </el-select>
-              <el-date-picker v-model="categoryYear" type="year" placeholder="选择年" style="width: 189px"> </el-date-picker>
+              <el-date-picker v-model="categoryYear" size="small" type="year" placeholder="选择年" style="width: 189px"> </el-date-picker>
             </div>
           </div>
           <div id="category" class="category"></div>
@@ -54,12 +54,25 @@
         <div>
           <div class="echarts-title">
             <h4>有害垃圾地区排放量统计</h4>
-            <el-date-picker v-model="categoryYear" type="year" placeholder="选择年" style="width: 109px"> </el-date-picker>
+            <el-date-picker v-model="categoryYear" size="small" type="year" placeholder="选择年" style="width: 109px"> </el-date-picker>
           </div>
           <div id="bar" class="bar"></div>
         </div>
 
-        <div></div>
+        <div>
+          <div class="echarts-title">
+            <h4>有害垃圾地区排放公司</h4>
+          </div>
+          <div class="companys">
+            <ul>
+              <li v-for="(item, i) in pointsData" :key="i" @click="companyPoint(item)">
+                <el-tooltip class="item" effect="light" :content="item.slagName" placement="top">
+                  <span>{{ item.slagName }}</span>
+                </el-tooltip>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -108,10 +121,11 @@ export default {
         contourLayer: null,
         drawLayer: null,
       },
-      selectedFeature: null,
+      pointsData: pointsData,
       //plot
       plotFunctions: null,
       companyEcharts: company.echarts,
+      echartsTitle: "总排放量（mg TEQ）",
       categoryYear: "2021",
       categoryValue: "全部",
       options: {},
@@ -133,19 +147,47 @@ export default {
       let myChart = echarts.init(document.getElementById("category"));
       myChart.setOption(
         {
+          title: {
+            text: this.echartsTitle,
+            textStyle: {
+              fontSize: 14,
+              fontWeight: "normal",
+            },
+          },
+          grid: {
+            x: 35,
+            x2: 30,
+            y: 30,
+            y2: 50,
+          },
+          tooltip: {
+            trigger: "axis",
+            axisPointer: {
+              // 坐标轴指示器，坐标轴触发有效
+              type: "line", // 默认为直线，可选为：'line' | 'shadow'
+            },
+          },
           xAxis: {
             type: "category",
-            // data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-            data: this.getArrayProps(this.companyEcharts, "name"),
+            boundaryGap: false,
+            data: this.getArrayProps(this.companyEcharts.categoryData, "name"),
+            axisTick: {
+              show: false, //不显示坐标轴刻度线
+            },
           },
           yAxis: {
             type: "value",
+            // splitLine: {
+            //   //网格线
+            //   show: false,
+            // },
           },
           series: [
             {
               // data: [820, 932, 901, 934, 1290, 1330, 1320],
-              data: this.getArrayProps(this.companyEcharts, "value"),
+              data: this.getArrayProps(this.companyEcharts.categoryData, "value"),
               type: "line",
+              areaStyle: {},
               smooth: true,
             },
           ],
@@ -157,6 +199,13 @@ export default {
       let myChart = echarts.init(document.getElementById("bar"));
       myChart.setOption(
         {
+          title: {
+            text: this.echartsTitle,
+            textStyle: {
+              fontSize: 14,
+              fontWeight: "normal",
+            },
+          },
           tooltip: {
             trigger: "axis",
             axisPointer: {
@@ -164,19 +213,36 @@ export default {
               type: "shadow", // 默认为直线，可选为：'line' | 'shadow'
             },
           },
+          legend: {
+            data: this.companyEcharts.echartLegend,
+            left: "right",
+            textStyle: {
+              color: "#333",
+            },
+          },
           grid: {
-            left: "3%",
-            right: "4%",
-            bottom: "3%",
-            containLabel: true,
+            // top: "13%",
+            // left: "0%",
+            // right: "4%",
+            // bottom: "3%",
+            // containLabel: true,
+            x: 35,
+            x2: 30,
+            y: 30,
+            y2: 50,
           },
           xAxis: [
             {
               type: "category",
-              data: this.getArrayProps(this.companyEcharts, "name"),
+              data: this.getArrayProps(this.companyEcharts.barData, "name"),
               axisTick: {
                 alignWithLabel: true,
               },
+              boundaryGap: false,
+              axisTick: {
+                show: false, //不显示坐标轴刻度线
+              },
+              axisLabel: { rotate: 30 },
             },
           ],
           yAxis: [
@@ -191,10 +257,10 @@ export default {
           ],
           series: [
             {
-              name: "",
+              name: "二噁英",
               type: "bar",
-              barWidth: "60%",
-              data: this.getArrayProps(this.companyEcharts, "value"),
+              barWidth: "20%",
+              data: this.getArrayProps(this.companyEcharts.barData, "value"),
             },
           ],
         },
@@ -227,23 +293,6 @@ export default {
               crossOrigin: "anonymous",
             }),
           }),
-
-          //切片影像图
-          // new TileLayer({
-          //   source: new TileWMS({
-          //     url: 'https://ahocevar.com/geoserver/wms',
-          //     params: {
-          //       'LAYERS': 'ne:NE1_HR_LC_SR_W_DR'
-          //     },
-          //     crossOrigin: 'anonymous'
-          //   })
-          // }),
-          //滇池流域矢量图（Arcgis地图）
-          // new TileLayer({
-          //   source: new TileArcGISRest({
-          //     url: "http://192.168.2.21:6080/arcgis/rest/services/dcly_hlm/MapServer"
-          //   }),
-          // }),
         ],
         //视图，这里设置坐标系
         view: new View({
@@ -383,11 +432,14 @@ export default {
         this.map.render();
       });
     },
+    //公司点击事件
+    companyPoint(item) {
+      let vectorSource = this.layers.pointLayer.getSource().getFeatureById(item.id);
+      this.onPointClick(vectorSource);
+    },
     //点位点击事件
     onPointClick(feature) {
-      console.log(feature);
       const attributes = feature.getProperties();
-      console.log(attributes);
       //信息窗
       this.overlay.setPosition(attributes.geometry.flatCoordinates);
       // this.overlayContent = attributes.name;
@@ -455,7 +507,7 @@ export default {
 <style scoped lang="scss">
 #map {
   width: 100%;
-  height: calc(100vh - 60px);
+  height: calc(100vh - 79px);
   position: relative;
 }
 .overlay-container {
@@ -557,10 +609,10 @@ export default {
 }
 .left-echarts {
   width: 450px;
-  height: 100%;
+  height: calc(100% - 0px);
   position: absolute;
   top: 0;
-  left: 5px;
+  left: 0;
   z-index: 900;
   // background-color: #fff;
   display: flex;
@@ -572,9 +624,11 @@ export default {
 
     h4 {
       width: 200px;
-      height: 40px;
+      height: 32px;
       padding: 0 10px;
+      line-height: 32px;
       margin-right: 5px;
+      color: #fff;
       background: url("../assets/images/title-bj.png") no-repeat;
       background-size: 100% 100%;
     }
@@ -582,12 +636,29 @@ export default {
   .category,
   .bar {
     width: 100%;
-    height: 270px;
+    height: 200px;
   }
-  > div:nth-child(-n + 2) {
+  .companys {
+    height: 320px;
+    padding: 10px;
+    ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      li {
+        width: 100%;
+        height: 25px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+    }
+  }
+  > div:nth-child(-n + 3) {
     width: 100%;
-    height: calc(100% / 3);
     margin-bottom: 5px;
+    background-color: #fff;
     background: url("../assets/images/bj.png") no-repeat;
     background-size: 100% 100%;
   }
