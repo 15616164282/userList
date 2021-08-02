@@ -67,7 +67,7 @@
                 <el-button
                   slot="append"
                   type="primary"
-                  @click="initMap()"
+                  @click="loadMap()"
                   style="color: #fff; background-color: #409eff; border-color: #409eff; border-radius: 0px"
                   >获取经纬度</el-button
                 >
@@ -191,7 +191,9 @@
           <el-button type="primary" @click="dialogVisible = false">返回</el-button>
         </div>
       </div>
-      <div id="map-address"></div>
+      <div class="map-box">
+        <div id="map-address"></div>
+      </div>
     </div>
     <div class="modal" v-show="dialogVisible"></div>
   </div>
@@ -541,9 +543,14 @@ export default {
           console.log(err);
         });
     },
+    loadMap() {
+      this.dialogVisible = true;
+      if (this.dialogVisible == true) {
+        this.initMap();
+      }
+    },
     //初始化地图
     initMap() {
-      this.dialogVisible = true;
       this.map = new Map({
         //地图div id
         target: "map-address",
@@ -594,6 +601,7 @@ export default {
           maxZoom: 18,
           projection: "EPSG:4326",
         }),
+        //控制组件：比例尺
       });
       // //添加点位图层
       this.layers.pointLayer = new VectorLayer({
@@ -652,11 +660,6 @@ export default {
 
 <style lang="scss">
 .companyAdd {
-  #map-address {
-    // position: relative;
-    width: 100%;
-    height: 640px;
-  }
   .el-timeline-item__dot {
     left: -9px;
   }
@@ -770,7 +773,7 @@ export default {
     top: 160px;
     left: 280px;
     width: calc(100vw - 400px);
-    // height: 700px;
+    height: 700px;
     overflow: auto;
     margin: 0;
     background-color: #ffffff;
@@ -789,21 +792,30 @@ export default {
         justify-content: flex-start;
       }
     }
+    .map-box {
+      position: relative;
+      width: 100%;
+      height: 640px;
+      #map-address {
+        position: relative;
+        width: 100%;
+        height: 640px;
+      }
+      // /deep/ .amap-logo {
+      //   display: none !important;
+      // }
 
-    /deep/ .amap-logo {
-      display: none !important;
-    }
+      // /deep/ .amap-container {
+      //   cursor: default;
+      // }
 
-    /deep/ .amap-container {
-      cursor: default;
-    }
-
-    .map-txt {
-      position: absolute;
-      right: 5px;
-      bottom: 5px;
-      color: #ffffff;
-      pointer-events: none;
+      // .map-txt {
+      //   position: absolute;
+      //   right: 5px;
+      //   bottom: 5px;
+      //   color: #ffffff;
+      //   pointer-events: none;
+      // }
     }
   }
   .modal {

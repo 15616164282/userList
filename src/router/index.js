@@ -45,6 +45,17 @@ const routes = [
         component: () => import("../views/map.vue"),
         meta: { title: "openlayers", breadcrumb: ["openlayers"] },
       },
+      {
+        path: "/Bus",
+        name: "Bus",
+        component: () => import("../views/Bus.vue"),
+        meta: { title: "高德地图公交", breadcrumb: ["高德地图公交"] },
+      }, {
+        path: "/RoadNetwork",
+        name: "RoadNetwork",
+        component: () => import("../views/RoadNetwork.vue"),
+        meta: { title: "高德地图路网", breadcrumb: ["高德地图路网"] },
+      },
     ]
   },
 ];

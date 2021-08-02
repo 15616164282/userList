@@ -62,6 +62,8 @@ export default {
             { path: "/CompanyAdd", name: "新增企业", ico: "el-icon-circle-plus" },
             { path: "/CompanyManag", name: "企业注册管理", ico: "el-icon-office-building" },
             { path: "/map", name: "map地图", ico: "el-icon-map-location" },
+            { path: "/RoadNetwork", name: "高德地图路网", ico: "el-icon-map-location" },
+            { path: "/Bus", name: "高德地图公交", ico: "el-icon-map-location" },
           ],
         },
       ],
