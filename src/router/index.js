@@ -12,7 +12,7 @@ const routes = [
     path: "/userHome",
     name: "UserHome",
     component: UserHome,
-    redirect: "/UserInfor",
+    redirect: "/RoadNetwork",
     children: [
       {
         path: "/UserInfor",
