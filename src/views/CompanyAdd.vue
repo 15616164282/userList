@@ -462,14 +462,15 @@ export default {
     },
     //切换其他业务复选框
     changeqtyw(val) {
-      // for (let j = 1; j < this.activitieList.length; j++) {
-      //   this.activitieList[j].type = "0";
-      //   for (let i = 0; i <script val.length; i++) {
-      //     if (val[i] === this.activitieList[j].value) {
-      //       this.activitieList[j].type = "1";
-      //     }
-      //   }
-      // }
+      let arr = this.activitieList;
+      for (let j = 1; j < arr.length; j++) {
+        this.activitieList[j].type = "0";
+        for (let i = 0; i < val.length; i++) {
+          if (val[i] === this.activitieList[j].value) {
+            this.activitieList[j].type = "1";
+          }
+        }
+      }
     },
     //获取当前点击【其他业务】复选框
     itemChange(val) {
@@ -545,9 +546,9 @@ export default {
     },
     loadMap() {
       this.dialogVisible = true;
-      if (this.dialogVisible == true) {
+      this.$nextTick(() => {
         this.initMap();
-      }
+      });
     },
     //初始化地图
     initMap() {
@@ -797,7 +798,6 @@ export default {
       width: 100%;
       height: 640px;
       #map-address {
-        position: relative;
         width: 100%;
         height: 640px;
       }

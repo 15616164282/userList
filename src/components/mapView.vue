@@ -601,9 +601,9 @@ export default {
       color: #999;
       font-size: 14px;
       list-style: none;
-      span {
-        color: #6492ff;
-      }
+      // span {
+      //   color: #6492ff;
+      // }
     }
   }
 }

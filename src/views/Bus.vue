@@ -1,20 +1,39 @@
 <template>
   <div style="width: 100%; height: 889px; position: relative">
     <div id="MAps"></div>
-    <div class="input-card form-box" style="width: 32rem">
-      <el-input v-model="form.busStop" placeholder="请输入公交车站"></el-input>
-      <el-input v-model="form.busNumber" placeholder="请输入公交车号"></el-input>
-      <el-button type="primary" @click="Search">查询</el-button>
+    <div class="input-card form-box" style="">
+      <el-row>
+        <el-col :span="13">
+          <el-autocomplete
+            class="inline-input"
+            v-model="form.busStop"
+            :fetch-suggestions="querySearch"
+            placeholder="请输入公交车站"
+            :trigger-on-focus="false"
+            @select="handleSelect"
+            ><template slot-scope="{ item }">
+              <div class="name">{{ item.name }}</div>
+              <!-- <span class="addr">{{ item}}</span> -->
+            </template>
+          </el-autocomplete>
+        </el-col>
+        <el-col :span="7"><el-input v-model="form.busNumber" placeholder="请输入公交车号"></el-input></el-col>
+        <!-- <el-input v-model="form.busStop" placeholder="请输入公交车站"></el-input> -->
+        <el-col :span="4"><el-button type="primary" @click="Search">查询</el-button></el-col>
+      </el-row>
     </div>
     <div id="tip"></div>
   </div>
 </template>
-
+<script type="text/javascript" src="https://a.amap.com/jsapi_demos/static/demo-center/js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="https://a.amap.com/jsapi_demos/static/demo-center/js/underscore-min.js"></script>
+<script type="text/javascript" src="https://a.amap.com/jsapi_demos/static/demo-center/js/backbone-min.js"></script>
+<script type="text/javascript" src="https://a.amap.com/jsapi_demos/static/demo-center/js/prety-json.js"></script>
 <script>
 export default {
   name: "Bus",
   data() {
-    return { map: {}, busStop: "", form: {}, markers: [] };
+    return { map: {}, busStop: "", form: {}, markers: [], busImg: require("../assets/images/BUS2.png"), queryResult: [] };
   },
   components: {},
   methods: {
@@ -31,43 +50,79 @@ export default {
         zoom: 13,
       });
     },
+    // autoInput(queryString) {
+    //   let that = this;
+    //   // var keywords = document.getElementById("input").value;
+    //   AMap.plugin("AMap.Autocomplete", function () {
+    //     // 实例化Autocomplete
+    //     var autoOptions = {
+    //       city: "长沙",
+    //     };
+    //     var autoComplete = new AMap.Autocomplete(autoOptions);
+    //     autoComplete.search(queryString, function (status, result) {
+    //       // 搜索成功时，result即是对应的匹配数据
+    //       // var node = new PrettyJSON.view.Node({
+    //       //   el: document.querySelector("#input-info"),
+    //       //   data: result,
+    //       // });
+    //       that.queryResult = result.tips;
+    //     });
+    //   });
+    // },
 
+    createFilter(queryString) {
+      return (restaurant) => {
+        return restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+      };
+    },
+    handleSelect(item) {
+      console.log(item);
+    },
     Search() {
       this.stationSearch();
       this.lineSearch();
     },
     /*公交站点查询*/
-    stationSearch() {
+    stationSearch(queryString) {
       let that = this;
       this.markers = [];
-      let stationKeyWord = this.form.busStop;
-      if (!stationKeyWord) return;
+      // let stationKeyWord = this.form.busStop;
+      if (!queryString) return;
       //实例化公交站点查询类
       var station = new AMap.StationSearch({
         pageIndex: 1, //页码
         pageSize: 60, //单页显示结果条数
         city: "183", //确定搜索城市
       });
-      station.search(stationKeyWord, function (status, result) {
+      station.search(queryString, function (status, result) {
         if (status === "complete" && result.info === "OK") {
           console.log(result);
           that.stationSearch_CallBack(result);
-        } else {
-          console.log(result);
-          document.getElementById("tip").innerHTML = JSON.stringify(result);
         }
+      });
+    },
+    querySearch(queryString, cb) {
+      this.stationSearch(queryString);
+      this.$nextTick(() => {
+        var restaurants = this.queryResult;
+        // var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
+        // 调用 callback 返回建议列表的数据
+        console.log(restaurants);
+        cb(restaurants);
       });
     },
     /*公交站点查询返回数据解析*/
     stationSearch_CallBack(searchResult) {
+      this.queryResult = searchResult.stationInfo;
       let stationArr = searchResult.stationInfo;
       let searchNum = stationArr.length;
       if (searchNum > 0) {
-        document.getElementById("tip").innerHTML = "查询结果：共" + searchNum + "个相关站点";
+        // document.getElementById("tip").innerHTML = "查询结果：共" + searchNum + "个相关站点";
         for (let i = 0; i < searchNum; i++) {
+          console.log(stationArr[i].location);
           var marker = new AMap.Marker({
             icon: new AMap.Icon({
-              image: "//a.amap.com/jsapi_demos/static/resource/img/pin.png",
+              image: this.busImg,
               size: new AMap.Size(32, 32),
               imageSize: new AMap.Size(32, 32),
             }),
@@ -104,7 +159,7 @@ export default {
           extensions: "all",
         });
       }
-      //搜索“536”相关公交线路
+      //搜索公交线路
       linesearch.search(busLineName, function (status, result) {
         that.map.clearMap();
         if (status === "complete" && result.info === "OK") {
@@ -185,6 +240,9 @@ export default {
   z-index: 999;
   display: flex;
   flex-direction: row;
+  .inline-input {
+    width: 100%;
+  }
   // .form-box {
 
   // }

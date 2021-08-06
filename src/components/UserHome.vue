@@ -4,23 +4,23 @@
       <el-menu
         :default-active="$router.currentRoute.path"
         class="el-menu-vertical-demo"
-        background-color="#545c64"
-        text-color="#fff"
-        active-text-color="#ffd04b"
+        background-color="#409eff"
+        text-color="#333"
+        active-text-color="#3280fc"
         :collapse="isCollapse"
         :router="true"
         :unique-opened="false"
       >
-        <el-submenu :index="item.path" v-for="(item, i) in menu" :key="i">
+        <!-- <el-submenu :index="item.path" v-for="(item, i) in menu" :key="i">
           <template slot="title">
             <i :class="item.ico"></i>
             <span slot="title">{{ item.name }}</span>
-          </template>
-          <el-menu-item :index="item.path" v-for="(item, index) in menu[i].child" :key="index">
-            <i :class="item.ico"></i>
-            <span slot="title">{{ item.name }}</span>
-          </el-menu-item>
-        </el-submenu>
+          </template> -->
+        <el-menu-item :index="item.path" v-for="(item, index) in menu" :key="index">
+          <i :class="item.ico"></i>
+          <span slot="title">{{ item.name }}</span>
+        </el-menu-item>
+        <!-- </el-submenu> -->
       </el-menu>
       <el-col :span="24" style="padding-left: 10px; padding-top: 10px">
         <Navbar></Navbar>
@@ -42,29 +42,29 @@ export default {
   },
   data() {
     return {
-      isCollapse: true,
+      isCollapse: false,
       menu: [
         {
-          path: "task1",
-          name: "任务一",
-          ico: "el-icon-setting",
-          child: [
-            { path: "/UserInfor", name: "个人信息", ico: "el-icon-s-custom" },
-            { path: "/UserExper", name: "个人经历", ico: "el-icon-document-copy" },
-            { path: "/UserEchart", name: "echarts图表", ico: "el-icon-pie-chart" },
-          ],
+          path: "/Bus",
+          name: "高德地图公交",
+          ico: "el-icon-map-location",
+          // child: [
+          //   { path: "/UserInfor", name: "个人信息", ico: "el-icon-s-custom" },
+          //   { path: "/UserExper", name: "个人经历", ico: "el-icon-document-copy" },
+          //   { path: "/UserEchart", name: "echarts图表", ico: "el-icon-pie-chart" },
+          // ],
         },
         {
-          path: "task2",
-          name: "任务二",
-          ico: "el-icon-setting",
-          child: [
-            { path: "/CompanyAdd", name: "新增企业", ico: "el-icon-circle-plus" },
-            { path: "/CompanyManag", name: "企业注册管理", ico: "el-icon-office-building" },
-            { path: "/map", name: "map地图", ico: "el-icon-map-location" },
-            { path: "/RoadNetwork", name: "高德地图路网", ico: "el-icon-map-location" },
-            { path: "/Bus", name: "高德地图公交", ico: "el-icon-map-location" },
-          ],
+          path: "/RoadNetwork",
+          name: "高德地图路网",
+          ico: "el-icon-map-location",
+          // child: [
+          //   { path: "/CompanyAdd", name: "新增企业", ico: "el-icon-circle-plus" },
+          //   { path: "/CompanyManag", name: "企业注册管理", ico: "el-icon-office-building" },
+          //   { path: "/map", name: "map地图", ico: "el-icon-map-location" },
+          //   { path: "/RoadNetwork", name: "高德地图路网", ico: "el-icon-map-location" },
+          //   { path: "/Bus", name: "高德地图公交", ico: "el-icon-map-location" },
+          // ],
         },
       ],
     };
@@ -80,11 +80,20 @@ export default {
 </script>
 
 <style scoped lang="scss">
+$silderColor: rgba(224, 234, 240, 0.5);
 .userHome {
   .el-menu-vertical-demo {
     // text-align: center;
+    background-color: $silderColor !important;
+    /deep/.el-submenu__title {
+      background-color: $silderColor !important;
+    }
+    /deep/.el-menu-item {
+      background-color: $silderColor !important;
+      color: #3280fc;
+    }
     i {
-      color: #fff;
+      color: #3280fc;
     }
   }
 }

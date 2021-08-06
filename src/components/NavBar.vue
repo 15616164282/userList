@@ -33,7 +33,7 @@ export default {
   name: "NavBar",
   data() {
     return {
-      flag: true,
+      flag: false,
       breadcrumb: [],
       tags: [],
     };
