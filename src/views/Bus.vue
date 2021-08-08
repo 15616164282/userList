@@ -13,12 +13,10 @@
             @select="handleSelect"
             ><template slot-scope="{ item }">
               <div class="name">{{ item.name }}</div>
-              <!-- <span class="addr">{{ item}}</span> -->
             </template>
           </el-autocomplete>
         </el-col>
         <el-col :span="7"><el-input v-model="form.busNumber" placeholder="请输入公交车号"></el-input></el-col>
-        <!-- <el-input v-model="form.busStop" placeholder="请输入公交车站"></el-input> -->
         <el-col :span="4"><el-button type="primary" @click="Search">查询</el-button></el-col>
       </el-row>
     </div>
@@ -69,13 +67,29 @@ export default {
     //     });
     //   });
     // },
-
-    createFilter(queryString) {
-      return (restaurant) => {
-        return restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
-      };
-    },
     handleSelect(item) {
+      this.form.busStop = item.name;
+      this.map.remove(this.markers);
+      let marker = new AMap.Marker({
+        icon: new AMap.Icon({
+          image: this.busImg,
+          size: new AMap.Size(32, 32),
+          imageSize: new AMap.Size(32, 32),
+        }),
+        offset: new AMap.Pixel(-16, -32),
+        position: item.location,
+        map: this.map,
+        title: item.name,
+      });
+      marker.info = new AMap.InfoWindow({
+        content: item.name,
+        offset: new AMap.Pixel(0, -30),
+      });
+      marker.on("mouseover", function (e) {
+        e.target.info.open(this.map, e.target.getPosition());
+      });
+      this.markers.push(marker);
+      this.map.setFitView();
       console.log(item);
     },
     Search() {
@@ -94,32 +108,49 @@ export default {
         pageSize: 60, //单页显示结果条数
         city: "183", //确定搜索城市
       });
+      // let queryResult = [];
       station.search(queryString, function (status, result) {
         if (status === "complete" && result.info === "OK") {
           console.log(result);
+          that.queryResult = result.stationInfo;
           that.stationSearch_CallBack(result);
         }
       });
+      console.log(that.queryResult);
+
+      return this.queryResult;
     },
     querySearch(queryString, cb) {
-      this.stationSearch(queryString);
-      this.$nextTick(() => {
-        var restaurants = this.queryResult;
-        // var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
-        // 调用 callback 返回建议列表的数据
-        console.log(restaurants);
-        cb(restaurants);
+      let that = this;
+      this.markers = [];
+      // let stationKeyWord = this.form.busStop;
+      if (!queryString) return;
+      //实例化公交站点查询类
+      var station = new AMap.StationSearch({
+        pageIndex: 1, //页码
+        pageSize: 60, //单页显示结果条数
+        city: "183", //确定搜索城市
       });
+      // let queryResult = [];
+      station.search(queryString, function (status, result) {
+        if (status === "complete" && result.info === "OK") {
+          console.log(result);
+          cb(result.stationInfo);
+          that.queryResult = result.stationInfo;
+          that.stationSearch_CallBack(result);
+        }
+      });
+      // var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
+      // 调用 callback 返回建议列表的数据
+      // console.log(this.queryResult);
     },
     /*公交站点查询返回数据解析*/
     stationSearch_CallBack(searchResult) {
-      this.queryResult = searchResult.stationInfo;
       let stationArr = searchResult.stationInfo;
       let searchNum = stationArr.length;
       if (searchNum > 0) {
         // document.getElementById("tip").innerHTML = "查询结果：共" + searchNum + "个相关站点";
         for (let i = 0; i < searchNum; i++) {
-          console.log(stationArr[i].location);
           var marker = new AMap.Marker({
             icon: new AMap.Icon({
               image: this.busImg,
