@@ -1,6 +1,16 @@
 {
   "code": 0,
   "message": "Success",
+  "disabledData":[{"address":"振兴路白田安置小区东北侧约70米"},
+    {"address":"黎托街道白沙湾路和顺石油加油站"},
+    {"address":"仙岭南路2号"},
+    {"address":"营盘东路85号湖南烈士公园内"},
+    {"address":"湘江中路与银盆岭大桥交叉口西北50米"},
+    {"address":"罗家嘴立交桥与南二环交叉路口往西北约180米"},
+    {"address":"友谊路138附近"},
+    {"address":"麓枫路麓谷锦园东北侧约160米"},
+    {"address":"马王堆中路162号附近"}
+    ],
   "data": [
     {
       "parent": "B02DB0VRDG",

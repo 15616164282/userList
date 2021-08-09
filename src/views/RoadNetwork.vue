@@ -11,12 +11,42 @@
       <el-checkbox v-model="Traffic" label="实时路况" @change="Traffic ? map.add(TrafficLayer) : map.remove(TrafficLayer)" border></el-checkbox>
       <el-checkbox v-model="Buildings" label="楼快" @change="Buildings ? map.add(BuildingsLayer) : map.remove(BuildingsLayer)" border></el-checkbox>
     </div>
+    <div class="checkgroup">
+      <div class="check"></div>
+      <!-- <el-dropdown trigger="click">
+        <span class="el-dropdown-link"
+          ><i class="el-icon-arrow-down el-icon--right"></i> 下拉菜单<i class="el-icon-arrow-down el-icon--right"></i>
+          <el-switch v-model="value2" disabled> </el-switch>开关
+        </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item icon="el-icon-plus"
+            >黄金糕
+            <div><el-switch v-model="value2" active-text="ON" inactive-text="OFF"> </el-switch></div
+          ></el-dropdown-item>
+          <el-dropdown-item icon="el-icon-circle-plus"
+            >狮子头
+            <div><el-switch v-model="value2"> </el-switch></div
+          ></el-dropdown-item>
+          <el-dropdown-item icon="el-icon-circle-plus-outline"
+            >螺蛳粉
+            <div><el-switch v-model="value2"> </el-switch></div
+          ></el-dropdown-item>
+          <el-dropdown-item icon="el-icon-check"
+            >双皮奶
+            <div><el-switch v-model="value2"> </el-switch></div
+          ></el-dropdown-item>
+          <el-dropdown-item icon="el-icon-circle-check"
+            >蚵仔煎
+            <div><el-switch v-model="value2"> </el-switch></div
+          ></el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown> -->
+    </div>
   </div>
 </template>
 
 <script>
 import wcJson from "../json/response_1628238808198.json";
-import wcimg from "../assets/images/WC.png";
 export default {
   name: "RoadNetwork",
   data() {
@@ -24,7 +54,8 @@ export default {
       map: {},
       markers: [],
       cluster: [],
-      RoadNet: true,
+      wcJsonData: [],
+      RoadNet: false,
       Satellite: false,
       Traffic: false,
       Buildings: false,
@@ -35,6 +66,7 @@ export default {
       BuildingsLayer: new AMap.Buildings(),
       checkList: [0],
       WC: require("../assets/images/WC.png"),
+      WCdisabled: require("../assets/images/WCdisabled.png"),
     };
   },
   components: {},
@@ -56,15 +88,29 @@ export default {
       let that = this;
       that.map = new AMap.Map("MAps", {
         center: [112.939981, 28.231061],
-        // layers: this.layers,
+        // layers: [new AMap.TileLayer.RoadNet()],
         resizeEnable: true,
         zoom: 9,
       });
       //添加标记
       let wcJsonData = wcJson.data;
-      for (let i = 0; i < wcJsonData.length; i++) {
+      this.wcJsonData = wcJsonData;
+      let wcDisabled = wcJson.disabledData;
+      var wcDisabledData = [];
+      for (let i = 0; i < wcDisabled.length; i++) {
+        // this.wcJsonData = this.wcJsonData.filter((o) => o.address != wcDisabled[i].address);
+        let DisabledData = this.wcJsonData.findIndex((o) => o.address == wcDisabled[i].address);
+        wcDisabledData.push(DisabledData);
+      }
+      console.log(wcDisabledData);
+      for (let i = 0; i < this.wcJsonData.length; i++) {
+        // if (condition) {
+
+        // } else {
+
+        // }
         let WCMarker = new AMap.Marker({
-          position: new AMap.LngLat(wcJsonData[i].real_lon, wcJsonData[i].real_lat),
+          position: new AMap.LngLat(wcJsonData[i].location.split(",")[0], wcJsonData[i].location.split(",")[1]),
           // 将一张图片的地址设置为 icon
           icon: new AMap.Icon({
             image: this.WC,
@@ -84,6 +130,16 @@ export default {
           e.target.info.open(this.map, e.target.getPosition());
         });
         this.markers.push(WCMarker);
+      }
+      for (let index = 0; index < wcDisabledData.length; index++) {
+        // removeMarkers(markers:Array<Marker>)
+        this.markers[wcDisabledData[index]].setIcon(
+          new AMap.Icon({
+            image: this.WCdisabled,
+            size: new AMap.Size(70, 70),
+            imageSize: new AMap.Size(70, 70),
+          })
+        );
       }
       //行政区修改样式
       let disProvince = new AMap.DistrictLayer.Province({

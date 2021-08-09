@@ -31,7 +31,7 @@
 export default {
   name: "Bus",
   data() {
-    return { map: {}, busStop: "", form: {}, markers: [], busImg: require("../assets/images/BUS2.png"), queryResult: [] };
+    return { map: {}, busStop: "", form: {}, markers: [], busImg: require("../assets/images/BUS2.png"), queryResult: [], infoWindow: {} };
   },
   components: {},
   methods: {
@@ -70,30 +70,38 @@ export default {
     handleSelect(item) {
       this.form.busStop = item.name;
       this.map.remove(this.markers);
+      this.infoWindow = new AMap.InfoWindow({ isCustom: true, offset: new AMap.Pixel(15, -30) });
       let marker = new AMap.Marker({
         icon: new AMap.Icon({
           image: this.busImg,
           size: new AMap.Size(32, 32),
           imageSize: new AMap.Size(32, 32),
         }),
-        offset: new AMap.Pixel(-16, -32),
+        // offset: new AMap.Pixel(-16, -32),
         position: item.location,
         map: this.map,
         title: item.name,
       });
-      marker.info = new AMap.InfoWindow({
-        content: item.name,
-        offset: new AMap.Pixel(0, -30),
+      //实例化信息窗体
+      let contents = [];
+      contents.push("<img src='http://tpc.googlesyndication.com/simgad/5843493769827749134'>地址：北京市朝阳区阜通东大街6号院3号楼东北8.3公里");
+      contents.push("电话：010-64733333");
+      contents.push("<a href='https://ditu.amap.com/detail/B000A8URXB?citycode=110105'>详细信息</a>");
+      marker.content = this.createInfoWindow(item.name, contents.join("<br/>"));
+      marker.on("mouseover", function (e) {
+        e.target.info.open(this.map, e.target.getPosition());
       });
       marker.on("mouseover", function (e) {
         e.target.info.open(this.map, e.target.getPosition());
       });
+      marker.on("click", this.markerClick);
+      marker.emit("click", { target: marker });
       this.markers.push(marker);
       this.map.setFitView();
       console.log(item);
     },
     Search() {
-      this.stationSearch();
+      // this.stationSearch();
       this.lineSearch();
     },
     /*公交站点查询*/
@@ -134,7 +142,6 @@ export default {
       // let queryResult = [];
       station.search(queryString, function (status, result) {
         if (status === "complete" && result.info === "OK") {
-          console.log(result);
           cb(result.stationInfo);
           that.queryResult = result.stationInfo;
           that.stationSearch_CallBack(result);
@@ -150,31 +157,98 @@ export default {
       let searchNum = stationArr.length;
       if (searchNum > 0) {
         // document.getElementById("tip").innerHTML = "查询结果：共" + searchNum + "个相关站点";
+        this.infoWindow = new AMap.InfoWindow({ isCustom: true, offset: new AMap.Pixel(15, -30) });
         for (let i = 0; i < searchNum; i++) {
+          console.log(stationArr[i]);
           var marker = new AMap.Marker({
             icon: new AMap.Icon({
               image: this.busImg,
               size: new AMap.Size(32, 32),
               imageSize: new AMap.Size(32, 32),
             }),
-            offset: new AMap.Pixel(-16, -32),
+            // offset: new AMap.Pixel(-16, -32),
             position: stationArr[i].location,
             map: this.map,
             title: stationArr[i].name,
           });
-          marker.info = new AMap.InfoWindow({
-            content: stationArr[i].name,
-            offset: new AMap.Pixel(0, -30),
-          });
+          //实例化信息窗体
+          let contents = [];
+          contents.push("<img src='http://tpc.googlesyndication.com/simgad/5843493769827749134'>地址：北京市朝阳区阜通东大街6号院3号楼东北8.3公里");
+          contents.push("电话：010-64733333");
+          // contents.push("<a href='https://ditu.amap.com/detail/B000A8URXB?citycode=110105'>详细信息</a>");
+          marker.content = this.createInfoWindow(stationArr[i].name, contents.join("<br/>"));
           marker.on("mouseover", function (e) {
             e.target.info.open(this.map, e.target.getPosition());
           });
+          // marker.on("click", function () {
+          //   // console.log(e);
+          //   marker.info.open(this.map, marker.getPosition());
+          //   // e.target.info.open(this.map, e.target.getPosition());
+          // });
+
+          // var infoWindow = new AMap.InfoWindow({
+          //   isCustom: true, //使用自定义窗体
+          //   content: this.createInfoWindow(title, content.join("<br/>")),
+          //   offset: new AMap.Pixel(16, -45),
+          // });
+          marker.on("click", this.markerClick);
+          marker.emit("click", { target: marker });
+          // AMap.event.addListener(marker, "click", function () {
+          //   infoWindow.open(this.map, marker.getPosition());
+          // });
           this.markers.push(marker);
         }
         this.map.setFitView();
       }
     },
+    markerClick(e) {
+      console.log(e);
+      // let infoWindow = new AMap.InfoWindow({ offset: new AMap.Pixel(0, -30) });
+      this.infoWindow.setContent(e.target.content);
+      this.infoWindow.open(this.map, e.target.getPosition());
+    },
+    //构建自定义信息窗体
+    createInfoWindow(title, content) {
+      var info = document.createElement("div");
+      info.className = "custom-info input-cards content-window-card";
 
+      //可以通过下面的方式修改自定义窗体的宽高
+      //info.style.width = "400px";
+      // 定义顶部标题
+      var top = document.createElement("div");
+      var titleD = document.createElement("div");
+      var closeX = document.createElement("img");
+      top.className = "info-top";
+      titleD.innerHTML = title;
+      closeX.src = "https://webapi.amap.com/images/close2.gif";
+      closeX.onclick = this.closeInfoWindow;
+
+      top.appendChild(titleD);
+      top.appendChild(closeX);
+      info.appendChild(top);
+
+      // 定义中部内容
+      var middle = document.createElement("div");
+      middle.className = "info-middle";
+      middle.style.backgroundColor = "white";
+      middle.innerHTML = content;
+      info.appendChild(middle);
+
+      // 定义底部内容
+      var bottom = document.createElement("div");
+      bottom.className = "info-bottom";
+      bottom.style.position = "relative";
+      bottom.style.top = "0px";
+      bottom.style.margin = "0 auto";
+      var sharp = document.createElement("img");
+      sharp.src = "https://webapi.amap.com/images/sharp.png";
+      bottom.appendChild(sharp);
+      info.appendChild(bottom);
+      return info;
+    },
+    closeInfoWindow() {
+      this.map.clearInfoWindow();
+    },
     /*公交线路查询*/
     lineSearch() {
       let that = this;
@@ -277,6 +351,77 @@ export default {
   // .form-box {
 
   // }
+}
+.content-window-card {
+  position: relative;
+  box-shadow: none;
+  bottom: 0;
+  left: 0;
+  width: auto;
+  padding: 0;
+}
+
+.content-window-card p {
+  height: 2rem;
+}
+
+.custom-info {
+  border: solid 1px silver;
+}
+
+div.info-top {
+  position: relative;
+  background: none repeat scroll 0 0 #f9f9f9;
+  border-bottom: 1px solid #ccc;
+  border-radius: 5px 5px 0 0;
+}
+
+div.info-top div {
+  display: inline-block;
+  color: #333333;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 31px;
+  padding: 0 10px;
+}
+
+div.info-top img {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  transition-duration: 0.25s;
+}
+
+div.info-top img:hover {
+  box-shadow: 0px 0px 5px #000;
+}
+
+div.info-middle {
+  font-size: 12px;
+  padding: 10px 6px;
+  line-height: 20px;
+}
+
+div.info-bottom {
+  height: 0px;
+  width: 100%;
+  clear: both;
+  text-align: center;
+}
+
+div.info-bottom img {
+  position: relative;
+  z-index: 104;
+}
+
+span {
+  margin-left: 5px;
+  font-size: 11px;
+}
+
+.info-middle img {
+  float: left;
+  margin-right: 6px;
 }
 // #show {
 //   height: 100px;
