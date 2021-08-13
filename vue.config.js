@@ -19,6 +19,13 @@ module.exports = {
           "^/api": "",
         },
       },
+      "/gaodeTraffic": {
+        target: "https://restapi.amap.com/v3/traffic/status",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/gaodeTraffic": "",
+        },
+      },
 
     },
   },

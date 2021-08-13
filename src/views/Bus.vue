@@ -19,23 +19,71 @@
         <el-col :span="7"><el-input v-model="form.busNumber" placeholder="请输入公交车号"></el-input></el-col>
         <el-col :span="4"><el-button type="primary" @click="Search">查询</el-button></el-col>
       </el-row>
+      <transition name="el-zoom-in-top">
+        <div v-show="drawer" class="transition-box drawer-box">
+          <div class="drawer-title">
+            <h5>交通态势路况</h5>
+            <i class="el-icon-circle-close" @click="handleClose"></i>
+          </div>
+          <ul>
+            <li v-for="(item, index) in trafficList" :key="index">
+              <div class="traficname">
+                <div style="color: #66b1ff; font-weight: bold">{{ item.loadName }}</div>
+                <div :style="{ color: traDesc[status].color }">
+                  <i class="iconfont icon-xingzhuangjiehe"></i>&ensp;{{ traDesc[status].description }}
+                </div>
+              </div>
+              <div>{{ item.description }}</div>
+            </li>
+          </ul>
+        </div>
+      </transition>
     </div>
-    <div id="tip"></div>
   </div>
 </template>
-<script type="text/javascript" src="https://a.amap.com/jsapi_demos/static/demo-center/js/jquery-1.11.1.min.js"></script>
-<script type="text/javascript" src="https://a.amap.com/jsapi_demos/static/demo-center/js/underscore-min.js"></script>
-<script type="text/javascript" src="https://a.amap.com/jsapi_demos/static/demo-center/js/backbone-min.js"></script>
-<script type="text/javascript" src="https://a.amap.com/jsapi_demos/static/demo-center/js/prety-json.js"></script>
+
+https://restapi.amap.com/v3/traffic/status/road?name=北环大道&adcode=440300&key=<用户的key>
+https://restapi.amap.com/v3/traffic/status/circle?location=116.3057764,39.98641364&radius=1500&key=<用户的key>
+
 <script>
+import axios from "axios";
 export default {
   name: "Bus",
   data() {
-    return { map: {}, busStop: "", form: {}, markers: [], busImg: require("../assets/images/BUS2.png"), queryResult: [], infoWindow: {} };
+    return {
+      key: "a50be5ec7c8a18ee46660e198e331499",
+      map: {},
+      circleMarker: {},
+      trafficList: [],
+      traDesc: [
+        { color: "#e6e6e6", description: "未知" },
+        { color: "#16CE95", description: "畅通" },
+        { color: "#F79D06", description: "缓行" },
+        { color: "#D80304", description: "拥堵" },
+        { color: "#8F0021", description: "严重拥堵" },
+      ],
+      status: 0,
+      drawer: false,
+      busStop: "",
+      radius: 1500,
+      form: {},
+      markers: [],
+      busImg: require("../assets/images/BUS2.png"),
+      queryResult: [],
+      infoWindow: {},
+    };
   },
   components: {},
   methods: {
+    handleClose(done) {
+      this.$confirm("确认关闭？")
+        .then((_) => {
+          this.drawer = false;
+        })
+        .catch((_) => {});
+    },
     initMaps() {
+      let that = this;
       // 配置地图的基本显示
       this.map = new AMap.Map("MAps", {
         center: [112.939981, 28.231061],
@@ -45,8 +93,55 @@ export default {
           // 路网
           new AMap.TileLayer.RoadNet(),
         ],
-        zoom: 13,
+        zoom: 11,
       });
+      this.map.on("click", this.showlnglat);
+    },
+    showlnglat(e) {
+      this.map.remove(this.circleMarker);
+      const lnglats = [e.lnglat.getLng(), e.lnglat.getLat()];
+      axios
+        .get("/gaodeTraffic/circle?location=" + lnglats[0] + "," + lnglats[1] + "&radius=" + this.radius + "&key=" + this.key + "&level=6")
+        .then((res) => {
+          console.log(res.data);
+          let datalength = res.data.trafficinfo.description.length;
+          console.log(datalength);
+          if (datalength) {
+            this.drawer = true;
+            this.status = res.data.trafficinfo.evaluation.status;
+            let trafficinfo = res.data.trafficinfo.description.split("；");
+            this.trafficList = trafficinfo.map((item) => {
+              return {
+                loadName: item.split("：")[0],
+                description: item.split("：")[1],
+              };
+            });
+          } else {
+            this.$message({
+              message: "该地区没有交通态势数据",
+              type: "warning",
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      console.log(lnglats);
+      this.circleMarker = new AMap.Circle({
+        center: lnglats,
+        map: this.map,
+        radius: this.radius,
+        fillColor: "#FF4D50", //圆形填充颜色
+        fillOpacity: 0.2, //填充透明度
+        strokeWeight: 1,
+        strokeColor: "#FF4D50", //线条颜色，为了保证感觉无线条，和填充颜色一致即可
+        strokeOpacity: 0.2, //线条透明度，为了保证感觉无线条，和填充颜色透明度一致即可
+        cursor: "pointer",
+        zIndex: 15,
+        extData: "data-id",
+      });
+      this.map.add(this.circleMarker);
+      this.map.setFitView();
     },
     // autoInput(queryString) {
     //   let that = this;
@@ -332,7 +427,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 #MAps {
   width: 100%;
   height: 100%;
@@ -351,7 +446,53 @@ export default {
   // .form-box {
 
   // }
+  .drawer-box {
+    width: 400px;
+    position: fixed;
+    top: 120px;
+    right: 10px;
+    // bottom: 50px;
+    background-color: #fff;
+    overflow: hidden;
+    margin: 0;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    .drawer-title {
+      margin: 10px;
+
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      h5 {
+        font-size: 16px !important;
+      }
+      .el-icon-circle-close {
+        display: inline-block;
+        font-size: 18px;
+        cursor: pointer;
+      }
+    }
+  }
 }
+ul {
+  display: flex;
+  flex-direction: column;
+  li {
+    padding: 0 10px 10px 10px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    .traficname {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      .icon-xingzhuangjiehe {
+        font-size: 18px;
+      }
+      div {
+        // display: inline-block;
+      }
+    }
+  }
+}
+
 .content-window-card {
   position: relative;
   box-shadow: none;
@@ -367,16 +508,15 @@ export default {
 
 .custom-info {
   border: solid 1px silver;
+  .info-top {
+    position: relative;
+    background: none repeat scroll 0 0 #f9f9f9;
+    border-bottom: 1px solid #ccc;
+    border-radius: 5px 5px 0 0;
+  }
 }
 
-div.info-top {
-  position: relative;
-  background: none repeat scroll 0 0 #f9f9f9;
-  border-bottom: 1px solid #ccc;
-  border-radius: 5px 5px 0 0;
-}
-
-div.info-top div {
+.info-top div {
   display: inline-block;
   color: #333333;
   font-size: 14px;
@@ -385,31 +525,31 @@ div.info-top div {
   padding: 0 10px;
 }
 
-div.info-top img {
+.info-top img {
   position: absolute;
   top: 10px;
   right: 10px;
   transition-duration: 0.25s;
 }
 
-div.info-top img:hover {
+.info-top img:hover {
   box-shadow: 0px 0px 5px #000;
 }
 
-div.info-middle {
+.info-middle {
   font-size: 12px;
   padding: 10px 6px;
   line-height: 20px;
 }
 
-div.info-bottom {
+.info-bottom {
   height: 0px;
   width: 100%;
   clear: both;
   text-align: center;
 }
 
-div.info-bottom img {
+.info-bottom img {
   position: relative;
   z-index: 104;
 }

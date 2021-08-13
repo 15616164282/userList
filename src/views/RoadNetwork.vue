@@ -14,7 +14,7 @@
     <div class="checkgroup">
       <div class="check-box" @mouseover="selectStyle" @mouseout="outStyle">
         <span class="check-left"><i class="iconfont icon-tuceng"></i>图层<i :class="isShow ? 'el-icon-arrow-down' : 'el-icon-arrow-up'"></i></span
-        ><span class="check-right">ON - OFF</span>
+        ><span class="check-right">OFF - ON</span>
         <ul v-show="isShow">
           <li>
             <div class="ifont"><i class="iconfont icon-ziyuan2"></i>&ensp;路网</div>
@@ -184,8 +184,10 @@ export default {
             image: this.WCdisabled,
             size: new AMap.Size(48, 48),
             imageSize: new AMap.Size(48, 48),
+            offset: new AMap.Pixel(-60, -60),
           })
         );
+        // offset: new AMap.Pixel(-13, -30),
         this.circleMark(wcJsonData[wcDisabledData[index]].location);
       }
 
@@ -243,7 +245,7 @@ export default {
       for (let i = 0; i < 3; i++) {
         let circleMarker = new AMap.Circle({
           center: new AMap.LngLat(location.split(",")[0], location.split(",")[1]),
-          radius: 600, //半径
+          radius: 1, //半径
           borderWeight: 3,
           strokeColor: "#FF4D50",
           strokeOpacity: 0.2,
@@ -262,23 +264,23 @@ export default {
           // console.log(item);
         });
         this.CircleNumId = setInterval(() => {
-          cricleArr[0].setRadius((circleNum += 50));
-          if (circleNum > 2000) {
+          cricleArr[0].setRadius((circleNum += 20));
+          if (circleNum > 200) {
             circleNum = 0;
           }
         }, 400);
         setTimeout(() => {
           this.CircleNumIdTwo = setInterval(() => {
-            cricleArr[1].setRadius((circleNumTwo += 50));
-            if (circleNumTwo > 2000) {
+            cricleArr[1].setRadius((circleNumTwo += 20));
+            if (circleNumTwo > 200) {
               circleNumTwo = 0;
             }
           }, 400);
         }, 1200);
         setTimeout(() => {
           this.CircleNumIdThree = setInterval(() => {
-            cricleArr[2].setRadius((circleNumThree += 50));
-            if (circleNumThree > 2000) {
+            cricleArr[2].setRadius((circleNumThree += 20));
+            if (circleNumThree > 200) {
               circleNumThree = 0;
             }
           }, 400);
@@ -327,11 +329,38 @@ export default {
         gridSize: 80,
       });
     },
+    /*公交站点查询*/
+    stationSearch() {
+      let that = this;
+      let stationKeyWord = "长沙公交车站";
+      if (!stationKeyWord) return;
+      //实例化公交站点查询类
+      var station = new AMap.StationSearch({
+        pageIndex: 1, //页码
+        pageSize: 120, //单页显示结果条数
+        city: "183", //确定搜索城市
+      });
+      // let queryResult = [];
+      station.search(stationKeyWord, function (status, result) {
+        if (status === "complete" && result.info === "OK") {
+          console.log(result.stationInfo);
+          // that.queryResult = result.stationInfo;
+          that.stationSearch_CallBack(result.stationInfo);
+        }
+      });
+      console.log(that.queryResult);
+    },
+    stationSearch_CallBack(searchResult) {
+      for (let i = 0; i < searchResult.length; i++) {
+        console.log(searchResult[i]);
+      }
+    },
   },
   async mounted() {
     await this.initMaps();
     this.addPoint();
     this.createHeatMap();
+    this.stationSearch();
   },
 };
 </script>
@@ -351,9 +380,10 @@ export default {
     width: 200px;
     height: 34px;
     border-radius: 5px;
-    background-color: #333;
-    color: #fff;
+    background-color: #fff;
+    color: #333;
     span {
+      margin-left: 0px !important;
       display: inline-block;
       line-height: 24px;
       font-size: 14px;
@@ -408,7 +438,7 @@ export default {
         padding: 5px;
         font-size: 14px;
         line-height: 24px;
-        background-color: #333;
+        background-color: #fff;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
@@ -418,23 +448,28 @@ export default {
           line-height: 24px;
         }
         .el-switch {
-          width: 23%;
+          width: 30%;
           line-height: 24px;
           margin-left: 30px;
+          padding-right: 10px;
         }
         /deep/.el-switch__label--right {
-          margin-left: -58px;
+          margin-left: -27px;
           z-index: 125;
-          line-height: 22px;
-          font-size: 12px;
-          color: #fff !important;
+          line-height: 21px !important ;
+          color: #333 !important;
         }
         /deep/.el-switch__label--left {
-          margin-right: -57px;
+          margin-right: -31px;
           z-index: 125;
-          line-height: 22px;
-          font-size: 12px;
-          color: #fff !important;
+          line-height: 21px !important ;
+          color: #333 !important;
+        }
+        /deep/.el-switch__label * {
+          font-size: 12px !important ;
+        }
+        /deep/.el-switch__core:after {
+          z-index: 127;
         }
       }
       li:last-child {
