@@ -4,20 +4,18 @@
     <div class="input-card form-box" style="">
       <el-row>
         <el-col :span="13">
-          <el-autocomplete
-            class="inline-input"
-            v-model="form.busStop"
-            :fetch-suggestions="querySearch"
-            placeholder="请输入公交车站"
-            :trigger-on-focus="false"
-            @select="handleSelect"
-            ><template slot-scope="{ item }">
+          <el-autocomplete class="inline-input" v-model="form.busStop" :fetch-suggestions="querySearch" placeholder="请输入公交车站" :trigger-on-focus="false" @select="handleSelect"><template
+              slot-scope="{ item }">
               <div class="name">{{ item.name }}</div>
             </template>
           </el-autocomplete>
         </el-col>
-        <el-col :span="7"><el-input v-model="form.busNumber" placeholder="请输入公交车号"></el-input></el-col>
-        <el-col :span="4"><el-button type="primary" @click="Search">查询</el-button></el-col>
+        <el-col :span="7">
+          <el-input v-model="form.busNumber" placeholder="请输入公交车号"></el-input>
+        </el-col>
+        <el-col :span="4">
+          <el-button type="primary" @click="Search">查询</el-button>
+        </el-col>
       </el-row>
       <transition name="el-zoom-in-top">
         <div v-show="drawer" class="transition-box drawer-box">
@@ -47,6 +45,7 @@ https://restapi.amap.com/v3/traffic/status/circle?location=116.3057764,39.986413
 
 <script>
 import axios from "axios";
+import BusInitMaps from "../utils/composition"
 export default {
   name: "Bus",
   data() {
@@ -56,7 +55,7 @@ export default {
       circleMarker: {},
       trafficList: [],
       traDesc: [
-        { color: "#e6e6e6", description: "未知" },
+        { color: "#bfbfbf", description: "未知" },
         { color: "#16CE95", description: "畅通" },
         { color: "#F79D06", description: "缓行" },
         { color: "#D80304", description: "拥堵" },
@@ -65,15 +64,25 @@ export default {
       status: 0,
       drawer: false,
       busStop: "",
-      radius: 1500,
+      radius: 100,
       form: {},
       markers: [],
       busImg: require("../assets/images/BUS2.png"),
+      trafficIcos:[require("../assets/images/unKnowCar.png"),require("../assets/images/unblockedCar.png"),require("../assets/images/slowlyCar.png"),require("../assets/images/congestionCar.png"),require("../assets/images/SevereCar.png")],
       queryResult: [],
       infoWindow: {},
     };
   },
   components: {},
+  setup(){
+    const {busMaps,getBusMaps} = BusInitMaps
+
+onMounted(getBusMaps)
+    return{
+      busMaps,
+      getBusMaps
+    }
+  },
   methods: {
     handleClose(done) {
       this.$confirm("确认关闭？")
@@ -82,67 +91,84 @@ export default {
         })
         .catch((_) => {});
     },
-    initMaps() {
-      let that = this;
-      // 配置地图的基本显示
-      this.map = new AMap.Map("MAps", {
-        center: [112.939981, 28.231061],
-        layers: [
-          // 卫星
-          // new AMap.TileLayer.Satellite(),
-          // 路网
-          new AMap.TileLayer.RoadNet(),
-        ],
-        zoom: 11,
-      });
-      this.map.on("click", this.showlnglat);
-    },
-    showlnglat(e) {
-      this.map.remove(this.circleMarker);
-      const lnglats = [e.lnglat.getLng(), e.lnglat.getLat()];
-      axios
-        .get("/gaodeTraffic/circle?location=" + lnglats[0] + "," + lnglats[1] + "&radius=" + this.radius + "&key=" + this.key + "&level=6")
-        .then((res) => {
-          console.log(res.data);
-          let datalength = res.data.trafficinfo.description.length;
-          console.log(datalength);
-          if (datalength) {
-            this.drawer = true;
-            this.status = res.data.trafficinfo.evaluation.status;
-            let trafficinfo = res.data.trafficinfo.description.split("；");
-            this.trafficList = trafficinfo.map((item) => {
-              return {
-                loadName: item.split("：")[0],
-                description: item.split("：")[1],
-              };
-            });
-          } else {
-            this.$message({
-              message: "该地区没有交通态势数据",
-              type: "warning",
-            });
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-      console.log(lnglats);
-      this.circleMarker = new AMap.Circle({
-        center: lnglats,
-        map: this.map,
-        radius: this.radius,
-        fillColor: "#FF4D50", //圆形填充颜色
-        fillOpacity: 0.2, //填充透明度
-        strokeWeight: 1,
-        strokeColor: "#FF4D50", //线条颜色，为了保证感觉无线条，和填充颜色一致即可
-        strokeOpacity: 0.2, //线条透明度，为了保证感觉无线条，和填充颜色透明度一致即可
-        cursor: "pointer",
-        zIndex: 15,
-        extData: "data-id",
-      });
-      this.map.add(this.circleMarker);
-      this.map.setFitView();
-    },
+    // initMaps() {
+    //   let that = this;
+    //   // 配置地图的基本显示
+    //   this.map = new AMap.Map("MAps", {
+    //     center: [112.939981, 28.231061],
+    //     layers: [
+    //       // 卫星
+    //       // new AMap.TileLayer.Satellite(),
+    //       // 路网
+    //       new AMap.TileLayer.RoadNet(),
+    //     ],
+    //     zoom: 11,
+    //   });
+    //   this.map.on("click", this.showlnglat);
+    // },
+    // showlnglat(e) {
+    //   this.map.remove(this.circleMarker);
+    //   const lnglats = [e.lnglat.getLng(), e.lnglat.getLat()];
+    //   axios
+    //     .get("/gaodeTraffic/circle?location=" + lnglats[0] + "," + lnglats[1] + "&radius=" + this.radius + "&key=" + this.key + "&level=6")
+    //     .then((res) => {
+    //       this.map.remove(this.markers);
+    //       console.log(res.data);
+    //       let datalength = res.data.trafficinfo.description.length;
+    //       console.log(datalength);
+    //       if (datalength) {
+    //         this.drawer = true;
+    //         this.status = res.data.trafficinfo.evaluation.status;
+    //         let trafficinfo = res.data.trafficinfo.description.split("；");
+    //         this.trafficList = trafficinfo.map((item) => {
+    //           return {
+    //             loadName: item.split("：")[0],
+    //             description: item.split("：")[1],
+    //           };
+    //         });
+
+    //         let marker = new AMap.Marker({
+    //           icon: new AMap.Icon({
+    //             image: this.trafficIcos[this.status],
+    //             size: new AMap.Size(32, 32),
+    //             imageSize: new AMap.Size(32, 32),
+    //           }),
+    //           // offset: new AMap.Pixel(-16, -32),
+    //           position: lnglats,
+    //           map: this.map,
+    //         });
+    //         this.markers.push(marker);
+    //         this.map.setFitView();
+    //         this.map.setZoom(13)
+    //       } else {
+    //         this.$message({
+    //           message: "该地区没有交通态势数据",
+    //           type: "warning",
+    //         });
+    //       }
+    //     })
+    //     .catch((err) => {
+    //       console.log(err);
+    //     });
+    //   console.log(lnglats);
+      
+    //   // this.circleMarker = new AMap.Circle({
+    //   //   center: lnglats,
+    //   //   map: this.map,
+    //   //   radius: this.radius,
+    //   //   fillColor: "#FF4D50", //圆形填充颜色
+    //   //   fillOpacity: 0.2, //填充透明度
+    //   //   strokeWeight: 1,
+    //   //   strokeColor: "#FF4D50", //线条颜色，为了保证感觉无线条，和填充颜色一致即可
+    //   //   strokeOpacity: 0.2, //线条透明度，为了保证感觉无线条，和填充颜色透明度一致即可
+    //   //   cursor: "pointer",
+    //   //   zIndex: 15,
+    //   //   extData: "data-id",
+    //   // });
+    //   // this.map.add(this.circleMarker);
+    //   // this.map.setFitView();
+    //   // this.map.setZoom(13)
+    // },
     // autoInput(queryString) {
     //   let that = this;
     //   // var keywords = document.getElementById("input").value;
@@ -422,7 +448,7 @@ export default {
     },
   },
   mounted() {
-    this.initMaps();
+    // this.initMaps();
   },
 };
 </script>
