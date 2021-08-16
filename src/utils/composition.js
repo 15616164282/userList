@@ -12,27 +12,42 @@ import {
 
 
 const busMaps = ref({})
-let maps = reactive({})
-let markers = reactive([])
-const trafficIcos = [
-  require("../assets/images/unKnowCar.png"),
-  require("../assets/images/unblockedCar.png"),
-  require("../assets/images/slowlyCar.png"),
-  require("../assets/images/congestionCar.png"),
-  require("../assets/images/SevereCar.png"),
-]
-let drawer = ref(false)
-let status = ref(0)
-let trafficList = ref([])
+const state = reactive({
+  maps: {},
+  markers: [],
+  trafficIcos: [
+    require("../assets/images/unKnowCar.png"),
+    require("../assets/images/unblockedCar.png"),
+    require("../assets/images/slowlyCar.png"),
+    require("../assets/images/congestionCar.png"),
+    require("../assets/images/SevereCar.png"),
+  ],
+  drawer: false,
+  status: 0,
+  trafficList: [],
+  initMaps
+})
+// let maps = reactive({})
+// let markers = reactive([])
+// const trafficIcos = [
+//   require("../assets/images/unKnowCar.png"),
+//   require("../assets/images/unblockedCar.png"),
+//   require("../assets/images/slowlyCar.png"),
+//   require("../assets/images/congestionCar.png"),
+//   require("../assets/images/SevereCar.png"),
+// ]
+// let drawer = ref(false)
+// let status = ref(0)
+// let trafficList = ref([])
 // const getBusMaps = () => {
 
 //   busMaps.value = initMaps()
 // }
 
-function initMaps () {
+function initMaps() {
   // let that = this;
   // 配置地图的基本显示
-  maps = new AMap.Map("MAps", {
+  state.maps = new AMap.Map("MAps", {
     center: [112.939981, 28.231061],
     layers: [
       // 卫星
@@ -42,7 +57,7 @@ function initMaps () {
     ],
     zoom: 11,
   });
-  maps.on("click", showlnglat);
+  state.maps.on("click", showlnglat);
 
 }
 
@@ -89,4 +104,11 @@ let showlnglat = function (e) {
       console.log(err);
     });
 }
-export default { initMaps, drawer, status, trafficList, markers }
+export default {
+  initMaps,
+  // drawer,
+  // status,
+  // trafficList,
+  // markers
+  state
+}

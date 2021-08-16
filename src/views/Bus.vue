@@ -52,6 +52,7 @@ https://restapi.amap.com/v3/traffic/status/circle?location=116.3057764,39.986413
 <script>
 import axios from "axios";
 import BusInitMaps from "../utils/composition";
+import { toRefs } from "@vue/composition-api";
 export default {
   name: "Bus",
   data() {
@@ -87,16 +88,10 @@ export default {
   },
   components: {},
   setup() {
-    const { initMaps, drawer, status, trafficList, markers } = BusInitMaps;
+    const { initMaps, state } = BusInitMaps;
 
     // onMounted(getBusMaps);
-    return {
-      initMaps,
-      drawer,
-      status,
-      trafficList,
-      markers,
-    };
+    return toRefs(state);
   },
   methods: {
     handleClose(done) {
