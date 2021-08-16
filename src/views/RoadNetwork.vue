@@ -13,8 +13,9 @@
     </div> -->
     <div class="checkgroup">
       <div class="check-box" @mouseover="selectStyle" @mouseout="outStyle">
-        <span class="check-left"><i class="iconfont icon-tuceng"></i>图层<i :class="isShow ? 'el-icon-arrow-down' : 'el-icon-arrow-up'"></i></span
-        ><span class="check-right">OFF - ON</span>
+        <span class="check-left"
+          ><i class="iconfont icon-tuceng"></i>&ensp;图层<i :class="isShow ? 'el-icon-arrow-down' : 'el-icon-arrow-up'"></i></span
+        ><span class="check-right"></span>
         <ul v-show="isShow">
           <li>
             <div class="ifont"><i class="iconfont icon-ziyuan2"></i>&ensp;路网</div>
@@ -23,7 +24,8 @@
               active-text="ON"
               inactive-text="OFF"
               :width="60"
-              inactive-color="#8CC5FF"
+              active-color="#409EFF"
+              inactive-color="#C0CCDA"
               @change="RoadNet ? map.add(roadNetLayer) : map.remove(roadNetLayer)"
             >
             </el-switch>
@@ -35,7 +37,8 @@
               active-text="ON"
               inactive-text="OFF"
               :width="60"
-              inactive-color="#8CC5FF"
+              active-color="#409EFF"
+              inactive-color="#C0CCDA"
               @change="Satellite ? map.add(satelliteLayer) : map.remove(satelliteLayer)"
             >
             </el-switch>
@@ -47,7 +50,8 @@
               active-text="ON"
               inactive-text="OFF"
               :width="60"
-              inactive-color="#8CC5FF"
+              active-color="#409EFF"
+              inactive-color="#C0CCDA"
               @change="Traffic ? map.add(TrafficLayer) : map.remove(TrafficLayer)"
             >
             </el-switch>
@@ -59,7 +63,8 @@
               active-text="ON"
               inactive-text="OFF"
               :width="60"
-              inactive-color="#8CC5FF"
+              active-color="#409EFF"
+              inactive-color="#C0CCDA"
               @change="Buildings ? map.add(BuildingsLayer) : map.remove(BuildingsLayer)"
             >
             </el-switch>
@@ -71,7 +76,8 @@
               active-text="ON"
               inactive-text="OFF"
               :width="60"
-              inactive-color="#8CC5FF"
+              active-color="#409EFF"
+              inactive-color="#C0CCDA"
               @change="heatMaps ? heatmap.show() : heatmap.hide()"
             >
             </el-switch>
@@ -153,7 +159,7 @@ export default {
         let DisabledData = this.wcJsonData.findIndex((o) => o.address == wcDisabled[i].address);
         wcDisabledData.push(DisabledData);
       }
-      console.log(wcDisabledData);
+      // console.log(wcDisabledData);
       for (let i = 0; i < this.wcJsonData.length; i++) {
         let WCMarker = new AMap.Marker({
           position: new AMap.LngLat(wcJsonData[i].location.split(",")[0], wcJsonData[i].location.split(",")[1]),
@@ -329,38 +335,11 @@ export default {
         gridSize: 80,
       });
     },
-    /*公交站点查询*/
-    stationSearch() {
-      let that = this;
-      let stationKeyWord = "长沙公交车站";
-      if (!stationKeyWord) return;
-      //实例化公交站点查询类
-      var station = new AMap.StationSearch({
-        pageIndex: 1, //页码
-        pageSize: 120, //单页显示结果条数
-        city: "183", //确定搜索城市
-      });
-      // let queryResult = [];
-      station.search(stationKeyWord, function (status, result) {
-        if (status === "complete" && result.info === "OK") {
-          console.log(result.stationInfo);
-          // that.queryResult = result.stationInfo;
-          that.stationSearch_CallBack(result.stationInfo);
-        }
-      });
-      console.log(that.queryResult);
-    },
-    stationSearch_CallBack(searchResult) {
-      for (let i = 0; i < searchResult.length; i++) {
-        console.log(searchResult[i]);
-      }
-    },
   },
   async mounted() {
     await this.initMaps();
     this.addPoint();
     this.createHeatMap();
-    this.stationSearch();
   },
 };
 </script>
@@ -388,7 +367,7 @@ export default {
       line-height: 24px;
       font-size: 14px;
       cursor: pointer;
-      text-align: center;
+      // text-align: center;
     }
     // .check-left::hover,
     // .check-right::hover {
@@ -398,9 +377,9 @@ export default {
       padding: 5px;
       position: relative;
       .icon-tuceng {
-        position: absolute;
-        left: 1rem;
-        top: 0.3rem;
+        // position: absolute;
+        // left: 1rem;
+        // top: 0.3rem;
       }
       .el-icon-arrow-down,
       .el-icon-arrow-up {
@@ -457,13 +436,13 @@ export default {
           margin-left: -27px;
           z-index: 125;
           line-height: 21px !important ;
-          color: #333 !important;
+          color: #fff !important;
         }
         /deep/.el-switch__label--left {
           margin-right: -31px;
           z-index: 125;
           line-height: 21px !important ;
-          color: #333 !important;
+          color: #fff !important;
         }
         /deep/.el-switch__label * {
           font-size: 12px !important ;

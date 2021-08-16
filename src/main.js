@@ -17,6 +17,10 @@ Vue.config.productionTip = false;
 import Element from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 Vue.use(Element);
+router.beforeEach((to, from, next) => {
+  window.document.title = "长沙城市交通" + to.meta.title
+  next()
+})
 
 new Vue({
   router,

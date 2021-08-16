@@ -4,8 +4,14 @@
     <div class="input-card form-box" style="">
       <el-row>
         <el-col :span="13">
-          <el-autocomplete class="inline-input" v-model="form.busStop" :fetch-suggestions="querySearch" placeholder="请输入公交车站" :trigger-on-focus="false" @select="handleSelect"><template
-              slot-scope="{ item }">
+          <el-autocomplete
+            class="inline-input"
+            v-model="form.busStop"
+            :fetch-suggestions="querySearch"
+            placeholder="请输入公交车站"
+            :trigger-on-focus="false"
+            @select="handleSelect"
+            ><template slot-scope="{ item }">
               <div class="name">{{ item.name }}</div>
             </template>
           </el-autocomplete>
@@ -45,7 +51,7 @@ https://restapi.amap.com/v3/traffic/status/circle?location=116.3057764,39.986413
 
 <script>
 import axios from "axios";
-import BusInitMaps from "../utils/composition"
+import BusInitMaps from "../utils/composition";
 export default {
   name: "Bus",
   data() {
@@ -53,7 +59,7 @@ export default {
       key: "a50be5ec7c8a18ee46660e198e331499",
       map: {},
       circleMarker: {},
-      trafficList: [],
+      // trafficList: [],
       traDesc: [
         { color: "#bfbfbf", description: "未知" },
         { color: "#16CE95", description: "畅通" },
@@ -61,27 +67,36 @@ export default {
         { color: "#D80304", description: "拥堵" },
         { color: "#8F0021", description: "严重拥堵" },
       ],
-      status: 0,
-      drawer: false,
+      // status: 0,
+      // drawer: false,
       busStop: "",
-      radius: 100,
+      // radius: 100,
       form: {},
-      markers: [],
+      // markers: [],
       busImg: require("../assets/images/BUS2.png"),
-      trafficIcos:[require("../assets/images/unKnowCar.png"),require("../assets/images/unblockedCar.png"),require("../assets/images/slowlyCar.png"),require("../assets/images/congestionCar.png"),require("../assets/images/SevereCar.png")],
+      // trafficIcos: [
+      //   require("../assets/images/unKnowCar.png"),
+      //   require("../assets/images/unblockedCar.png"),
+      //   require("../assets/images/slowlyCar.png"),
+      //   require("../assets/images/congestionCar.png"),
+      //   require("../assets/images/SevereCar.png"),
+      // ],
       queryResult: [],
       infoWindow: {},
     };
   },
   components: {},
-  setup(){
-    const {busMaps,getBusMaps} = BusInitMaps
+  setup() {
+    const { initMaps, drawer, status, trafficList, markers } = BusInitMaps;
 
-onMounted(getBusMaps)
-    return{
-      busMaps,
-      getBusMaps
-    }
+    // onMounted(getBusMaps);
+    return {
+      initMaps,
+      drawer,
+      status,
+      trafficList,
+      markers,
+    };
   },
   methods: {
     handleClose(done) {
@@ -130,8 +145,8 @@ onMounted(getBusMaps)
     //         let marker = new AMap.Marker({
     //           icon: new AMap.Icon({
     //             image: this.trafficIcos[this.status],
-    //             size: new AMap.Size(32, 32),
-    //             imageSize: new AMap.Size(32, 32),
+    //             size: new AMap.Size(38, 38),
+    //             imageSize: new AMap.Size(38, 38),
     //           }),
     //           // offset: new AMap.Pixel(-16, -32),
     //           position: lnglats,
@@ -139,7 +154,7 @@ onMounted(getBusMaps)
     //         });
     //         this.markers.push(marker);
     //         this.map.setFitView();
-    //         this.map.setZoom(13)
+    //         this.map.setZoom(13);
     //       } else {
     //         this.$message({
     //           message: "该地区没有交通态势数据",
@@ -151,7 +166,7 @@ onMounted(getBusMaps)
     //       console.log(err);
     //     });
     //   console.log(lnglats);
-      
+
     //   // this.circleMarker = new AMap.Circle({
     //   //   center: lnglats,
     //   //   map: this.map,
@@ -169,58 +184,55 @@ onMounted(getBusMaps)
     //   // this.map.setFitView();
     //   // this.map.setZoom(13)
     // },
-    // autoInput(queryString) {
-    //   let that = this;
-    //   // var keywords = document.getElementById("input").value;
-    //   AMap.plugin("AMap.Autocomplete", function () {
-    //     // 实例化Autocomplete
-    //     var autoOptions = {
-    //       city: "长沙",
-    //     };
-    //     var autoComplete = new AMap.Autocomplete(autoOptions);
-    //     autoComplete.search(queryString, function (status, result) {
-    //       // 搜索成功时，result即是对应的匹配数据
-    //       // var node = new PrettyJSON.view.Node({
-    //       //   el: document.querySelector("#input-info"),
-    //       //   data: result,
-    //       // });
-    //       that.queryResult = result.tips;
-    //     });
-    //   });
-    // },
-    handleSelect(item) {
-      this.form.busStop = item.name;
-      this.map.remove(this.markers);
-      this.infoWindow = new AMap.InfoWindow({ isCustom: true, offset: new AMap.Pixel(15, -30) });
-      let marker = new AMap.Marker({
-        icon: new AMap.Icon({
-          image: this.busImg,
-          size: new AMap.Size(32, 32),
-          imageSize: new AMap.Size(32, 32),
-        }),
-        // offset: new AMap.Pixel(-16, -32),
-        position: item.location,
-        map: this.map,
-        title: item.name,
+    autoInput(queryString) {
+      let that = this;
+      // var keywords = document.getElementById("input").value;
+      AMap.plugin("AMap.Autocomplete", function () {
+        // 实例化Autocomplete
+        var autoOptions = {
+          city: "长沙",
+        };
+        var autoComplete = new AMap.Autocomplete(autoOptions);
+        autoComplete.search(queryString, function (status, result) {
+          // 搜索成功时，result即是对应的匹配数据
+          // var node = new PrettyJSON.view.Node({
+          //   el: document.querySelector("#input-info"),
+          //   data: result,
+          // });
+          that.queryResult = result.tips;
+        });
       });
-      //实例化信息窗体
-      let contents = [];
-      contents.push("<img src='http://tpc.googlesyndication.com/simgad/5843493769827749134'>地址：北京市朝阳区阜通东大街6号院3号楼东北8.3公里");
-      contents.push("电话：010-64733333");
-      contents.push("<a href='https://ditu.amap.com/detail/B000A8URXB?citycode=110105'>详细信息</a>");
-      marker.content = this.createInfoWindow(item.name, contents.join("<br/>"));
-      marker.on("mouseover", function (e) {
-        e.target.info.open(this.map, e.target.getPosition());
-      });
-      marker.on("mouseover", function (e) {
-        e.target.info.open(this.map, e.target.getPosition());
-      });
-      marker.on("click", this.markerClick);
-      marker.emit("click", { target: marker });
-      this.markers.push(marker);
-      this.map.setFitView();
-      console.log(item);
     },
+    // handleSelect(item) {
+    //   this.form.busStop = item.name;
+    //   this.map.remove(this.markers);
+    //   this.infoWindow = new AMap.InfoWindow({ isCustom: true, offset: new AMap.Pixel(15, -30) });
+    //   let marker = new AMap.Marker({
+    //     icon: new AMap.Icon({
+    //       image: this.busImg,
+    //       size: new AMap.Size(32, 32),
+    //       imageSize: new AMap.Size(32, 32),
+    //     }),
+    //     // offset: new AMap.Pixel(-16, -32),
+    //     position: item.location,
+    //     map: this.map,
+    //     title: item.name,
+    //   });
+    //   //实例化信息窗体
+    //   let contents = [];
+    //   contents.push("<img src='http://tpc.googlesyndication.com/simgad/5843493769827749134'>地址：北京市朝阳区阜通东大街6号院3号楼东北8.3公里");
+    //   contents.push("电话：010-64733333");
+    //   contents.push("<a href='https://ditu.amap.com/detail/B000A8URXB?citycode=110105'>详细信息</a>");
+    //   marker.content = this.createInfoWindow(item.name, contents.join("<br/>"));
+    //   marker.on("mouseover", function (e) {
+    //     e.target.info.open(this.map, e.target.getPosition());
+    //   });
+    //   marker.on("click", this.markerClick);
+    //   marker.emit("click", { target: marker });
+    //   this.markers.push(marker);
+    //   this.map.setFitView();
+    //   console.log(item);
+    // },
     Search() {
       // this.stationSearch();
       this.lineSearch();
@@ -448,7 +460,8 @@ onMounted(getBusMaps)
     },
   },
   mounted() {
-    // this.initMaps();
+    this.initMaps();
+    // console.log(busMaps);
   },
 };
 </script>
@@ -493,6 +506,7 @@ onMounted(getBusMaps)
       }
       .el-icon-circle-close {
         display: inline-block;
+        color: #828282;
         font-size: 18px;
         cursor: pointer;
       }
@@ -504,7 +518,7 @@ ul {
   flex-direction: column;
   li {
     padding: 0 10px 10px 10px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    // box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
     .traficname {
       display: flex;
       flex-direction: row;

@@ -46,7 +46,7 @@ export default {
       menu: [
         {
           path: "/Bus",
-          name: "高德地图公交",
+          name: "公交",
           ico: "el-icon-map-location",
           // child: [
           //   { path: "/UserInfor", name: "个人信息", ico: "el-icon-s-custom" },
@@ -56,7 +56,7 @@ export default {
         },
         {
           path: "/RoadNetwork",
-          name: "高德地图路网",
+          name: "路网",
           ico: "el-icon-map-location",
           // child: [
           //   { path: "/CompanyAdd", name: "新增企业", ico: "el-icon-circle-plus" },
