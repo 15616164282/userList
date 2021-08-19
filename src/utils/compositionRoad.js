@@ -7,7 +7,7 @@ import axios from "axios"
 
 import wcJson from "../json/response_1628238808198.json";
 import heatmapData from "../json/heatMap.json";
-
+import addPoint from "../utils/components/MapPoint"
 import {
   ref,
   reactive
@@ -36,7 +36,7 @@ const state = reactive({
   WCdisabled: require("../assets/images/WCdisabled.png"),
   initMaps,
   createHeatMap,
-  addPoint
+  addClustererPoint
 })
 
 function initMaps () {
@@ -57,30 +57,17 @@ function initMaps () {
     let DisabledData = state.wcJsonData.findIndex((o) => o.address == wcDisabled[i].address);
     wcDisabledData.push(DisabledData);
   }
-  // console.log(wcDisabledData);
-  for (let i = 0; i < state.wcJsonData.length; i++) {
-    let WCMarker = new AMap.Marker({
-      position: new AMap.LngLat(wcJsonData[i].location.split(",")[0], wcJsonData[i].location.split(",")[1]),
-      // 将一张图片的地址设置为 icon
-      icon: new AMap.Icon({
-        image: state.WC,
-        size: new AMap.Size(20, 20),
-        imageSize: new AMap.Size(20, 20),
-      }),
-      // 设置了 icon 以后，设置 icon 的偏移量，以 icon 的 [center bottom] 为原点
-      // offset: new AMap.Pixel(-13, -30),
-      // map: this.map,
-      title: wcJsonData[i].name,
-    });
-    WCMarker.info = new AMap.InfoWindow({
-      content: wcJsonData[i].name,
-      // offset: new AMap.Pixel(0, -30),
-    });
-    WCMarker.on("mouseover", function (e) {
-      e.target.info.open(state.map, e.target.getPosition());
-    });
-    state.markers.push(WCMarker);
+  //添加标记
+  for (let i = 0; i < wcJsonData.length; i++) {
+    let lng = wcJsonData[i].location.split(",")[0]
+    let lat = wcJsonData[i].location.split(",")[1]
+    state.markers.push(addPoint(lng, lat, state.WC, 32, {
+      name: wcJsonData[i].name,
+      id: wcJsonData[i].id,
+    }))
   }
+  // addPoint(wcJsonData, state, 32)
+  //改变图标
   for (let index = 0; index < wcDisabledData.length; index++) {
     // removeMarkers(markers:Array<Marker>)
     state.markers[wcDisabledData[index]].setIcon(
@@ -161,7 +148,6 @@ function circleMark (location) {
     cricleArr.push(circleMarker);
     cricleArr.forEach((item) => {
       state.map.add(item);
-      // console.log(item);
     });
     const CircleNumId = setInterval(() => {
       cricleArr[0].setRadius((circleNum += 20));
@@ -222,7 +208,7 @@ function _renderClusterMarker (context) {
   context.marker.setContent(div);
 }
 //添加标记
-function addPoint () {
+function addClustererPoint () {
   state.cluster = new AMap.MarkerClusterer(state.map, state.markers, {
     // styles: sts,
     renderClusterMarker: _renderClusterMarker,

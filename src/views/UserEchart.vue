@@ -19,9 +19,9 @@ export default {
   methods: {
     getArrayProps(array, key) {
       var key = key || "value";
-      var res = [];
+      let res = [];
       if (array) {
-        array.forEach(function (t) {
+        array.forEach((t) => {
           res.push(t[key]);
         });
       }

@@ -106,7 +106,7 @@ export default {
   methods: {},
   async mounted() {
     await this.initMaps();
-    this.addPoint();
+    this.addClustererPoint();
     this.createHeatMap();
   },
 };

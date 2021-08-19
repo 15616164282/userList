@@ -1,5 +1,6 @@
 import vue from "vue"
 import VueComposition, {
+  nextTick,
   onMounted
 } from "@vue/composition-api"
 vue.use(VueComposition)
@@ -9,10 +10,10 @@ import {
   ref,
   reactive
 } from "@vue/composition-api"
-
+import addPoint from "../utils/components/MapPoint"
 
 const state = reactive({
-  maps: {},
+  map: {},
   markersCar: [],
   markersBus: [],
   form: {},
@@ -22,6 +23,13 @@ const state = reactive({
     require("../assets/images/slowlyCar.png"),
     require("../assets/images/congestionCar.png"),
     require("../assets/images/SevereCar.png"),
+  ],
+  traDesc: [
+    { color: "#bfbfbf", description: "未知" },
+    { color: "#16CE95", description: "畅通" },
+    { color: "#F79D06", description: "缓行" },
+    { color: "#D80304", description: "拥堵" },
+    { color: "#8F0021", description: "严重拥堵" },
   ],
   drawer: false,
   status: 0,
@@ -43,7 +51,7 @@ const state = reactive({
 //初始化地图
 function initMaps () {
   // 配置地图的基本显示
-  state.maps = new AMap.Map("MAps", {
+  state.map = new AMap.Map("MAps", {
     center: [112.939981, 28.231061],
     layers: [
       // 卫星
@@ -53,13 +61,13 @@ function initMaps () {
     ],
     zoom: 11,
   });
-  state.maps.on("click", showlnglat);
+  state.map.on("click", showlnglat);
 
 }
 //点击位置的交通态势
 function showlnglat (e) {
   const lnglats = [e.lnglat.getLng(), e.lnglat.getLat()];
-  state.maps.remove(state.markersCar);
+  state.map.remove(state.markersCar);
   axios
     .get("/gaodeTraffic/circle?location=" + lnglats[0] + "," + lnglats[1] + "&radius=100&key=a50be5ec7c8a18ee46660e198e331499&level=6")
     .then((res) => {
@@ -76,19 +84,23 @@ function showlnglat (e) {
             description: item.split("：")[1],
           };
         });
-        let marker = new AMap.Marker({
-          icon: new AMap.Icon({
-            image: state.trafficIcos[state.status],
-            size: new AMap.Size(32, 32),
-            imageSize: new AMap.Size(32, 32),
-          }),
-          // offset: new AMap.Pixel(-16, -32),
-          position: lnglats,
-          map: state.maps,
-        });
-        state.markersCar.push(marker);
-        state.maps.setFitView();
-        state.maps.setZoom(13)
+        // let marker = new AMap.Marker({
+        //   icon: new AMap.Icon({
+        //     image: state.trafficIcos[state.status],
+        //     size: new AMap.Size(32, 32),
+        //     imageSize: new AMap.Size(32, 32),
+        //   }),
+        //   // offset: new AMap.Pixel(-16, -32),
+        //   position: lnglats,
+        //   map: state.map,
+        // });
+        console.log(state.status);
+        state.markersCar.push(addPoint(e.lnglat.getLng(), e.lnglat.getLat(), state.trafficIcos[state.status], 32, { name: state.traDesc[state.status].description }));
+        // nextTick(() => {
+        state.map.setFitView();
+        state.map.setZoom(13)
+        // })
+
       } else {
         this.$message({
           message: "该地区没有交通态势数据",
@@ -105,7 +117,7 @@ function handleSelect (item) {
 
   console.log(item);
   state.form.busStop = item.name;
-  state.maps.remove(state.markersBus);
+  state.map.remove(state.markersBus);
   state.infoWindow = new AMap.InfoWindow({ isCustom: true, offset: new AMap.Pixel(15, -30) });
   let marker = new AMap.Marker({
     icon: new AMap.Icon({
@@ -115,7 +127,7 @@ function handleSelect (item) {
     }),
     // offset: new AMap.Pixel(-16, -32),
     position: item.location,
-    map: state.maps,
+    map: state.map,
     title: item.name,
   });
   //实例化信息窗体
@@ -125,12 +137,12 @@ function handleSelect (item) {
   contents.push("<a href='https://ditu.amap.com/detail/B000A8URXB?citycode=110105'>详细信息</a>");
   marker.content = createInfoWindow(item.name, contents.join("<br/>"));
   marker.on("mouseover", function (e) {
-    e.target.info.open(state.maps, e.target.getPosition());
+    e.target.info.open(state.map, e.target.getPosition());
   });
   marker.on("click", markerClick);
   marker.emit("click", { target: marker });
   state.markersBus.push(marker);
-  state.maps.setFitView();
+  state.map.setFitView();
 }
 //构建自定义信息窗体
 function createInfoWindow (title, content) {
@@ -175,10 +187,10 @@ function markerClick (e) {
   console.log(e);
   // let infoWindow = new AMap.InfoWindow({ offset: new AMap.Pixel(0, -30) });
   state.infoWindow.setContent(e.target.content);
-  state.infoWindow.open(state.maps, e.target.getPosition());
+  state.infoWindow.open(state.map, e.target.getPosition());
 }
 function closeInfoWindow () {
-  state.maps.clearInfoWindow();
+  state.map.clearInfoWindow();
 }
 
 /*公交站点查询*/
@@ -240,7 +252,7 @@ function stationSearch_CallBack (searchResult) {
         }),
         // offset: new AMap.Pixel(-16, -32),
         position: stationArr[i].location,
-        map: state.maps,
+        map: state.map,
         title: stationArr[i].name,
       });
       //实例化信息窗体
@@ -250,13 +262,13 @@ function stationSearch_CallBack (searchResult) {
       // contents.push("<a href='https://ditu.amap.com/detail/B000A8URXB?citycode=110105'>详细信息</a>");
       marker.content = createInfoWindow(stationArr[i].name, contents.join("<br/>"));
       marker.on("mouseover", function (e) {
-        e.target.info.open(state.maps, e.target.getPosition());
+        e.target.info.open(state.map, e.target.getPosition());
       });
       marker.on("click", markerClick);
       marker.emit("click", { target: marker });
       state.markersBus.push(marker);
     }
-    state.maps.setFitView();
+    state.map.setFitView();
   }
 }
 export default { state }

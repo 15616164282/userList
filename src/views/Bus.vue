@@ -56,13 +56,6 @@ export default {
   name: "Bus",
   data() {
     return {
-      traDesc: [
-        { color: "#bfbfbf", description: "未知" },
-        { color: "#16CE95", description: "畅通" },
-        { color: "#F79D06", description: "缓行" },
-        { color: "#D80304", description: "拥堵" },
-        { color: "#8F0021", description: "严重拥堵" },
-      ],
       busStop: "",
     };
   },
