@@ -46,9 +46,6 @@
   </div>
 </template>
 
-https://restapi.amap.com/v3/traffic/status/road?name=北环大道&adcode=440300&key=<用户的key>
-https://restapi.amap.com/v3/traffic/status/circle?location=116.3057764,39.98641364&radius=1500&key=<用户的key>
-
 <script>
 import BusInitMaps from "../utils/compositionBus";
 import { toRefs } from "@vue/composition-api";

@@ -1,3 +1,5 @@
+import { ref } from 'vue'
+
 //添加标记
 // export default function addPoint (pointData, state, imgSize) {
 //   for (let i = 0; i < pointData.length; i++) {
@@ -26,9 +28,10 @@
 
 // }
 
-export default function addPoint (lng, lat, imgUrl, imgSize, attributes) {
-  console.log(imgUrl);
-  let WCMarker = new AMap.Marker({
+export default function addPoint (lng, lat, imgUrl, stateMap, imgSize, attributes) {
+  console.log(lng, lat, imgUrl, stateMap, imgSize, attributes);
+
+  let Marker = new AMap.Marker({
     position: new AMap.LngLat(lng, lat),
     // 将一张图片的地址设置为 icon
     icon: new AMap.Icon({
@@ -38,16 +41,35 @@ export default function addPoint (lng, lat, imgUrl, imgSize, attributes) {
     }),
     // 设置了 icon 以后，设置 icon 的偏移量，以 icon 的 [center bottom] 为原点
     // offset: new AMap.Pixel(-13, -30),
-    // map: this.map,
+    map: stateMap,
     title: attributes.name,
   });
   // WCMarker.info = new AMap.InfoWindow({
   //   content: pointData[i].name,
   //   // offset: new AMap.Pixel(0, -30),
   // });
-  WCMarker.on("mouseover", function (e) {
-    e.target.info.open(state.map, e.target.getPosition());
+  Marker.on("mouseover", function (e) {
+    e.target.info.open(stateMap, e.target.getPosition());
   });
-  // state.markers.push(WCMarker);
-  return WCMarker
+  if (attributes.markerDialogVisible) {
+    console.log(attributes.markerDialogVisible);
+    Marker.content = attributes.contents;
+    Marker.on("click", markerClick(stateMap));
+    Marker.emit("click", { target: Marker });
+  }
+  return Marker
 }
+
+function markerClick (e, stateMap) {
+  // stateInfo = new AMap.InfoWindow({ isCustom: true, offset: new AMap.Pixel(15, -30) });
+  console.dir(e);
+
+  console.log(stateMap);
+
+  let infoWindow = new AMap.InfoWindow({ offset: new AMap.Pixel(0, -30) });
+  console.log(infoWindow);
+  infoWindow.setContent(e.target.content);
+  infoWindow.open(stateMap, e.target.getPosition());
+}
+
+

@@ -61,9 +61,10 @@ function initMaps () {
   for (let i = 0; i < wcJsonData.length; i++) {
     let lng = wcJsonData[i].location.split(",")[0]
     let lat = wcJsonData[i].location.split(",")[1]
-    state.markers.push(addPoint(lng, lat, state.WC, 32, {
+    state.markers.push(addPoint(lng, lat, state.WC, state.map, 32, {
       name: wcJsonData[i].name,
       id: wcJsonData[i].id,
+      markerDialogVisible: false,
     }))
   }
   // addPoint(wcJsonData, state, 32)

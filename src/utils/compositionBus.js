@@ -45,7 +45,7 @@ const state = reactive({
   querySearch,
   stationSearch_CallBack,
   handleSelect,
-  markerClick,
+  // markerClick,
 })
 
 //初始化地图
@@ -77,13 +77,14 @@ function showlnglat (e) {
         state.drawer = true;
         state.status = res.data.trafficinfo.evaluation.status;
         let trafficinfo = res.data.trafficinfo.description.split("；");
-        console.log(state.trafficList);
+
         state.trafficList = trafficinfo.map((item) => {
           return {
             loadName: item.split("：")[0],
             description: item.split("：")[1],
           };
         });
+        console.log(state.trafficList);
         // let marker = new AMap.Marker({
         //   icon: new AMap.Icon({
         //     image: state.trafficIcos[state.status],
@@ -94,12 +95,12 @@ function showlnglat (e) {
         //   position: lnglats,
         //   map: state.map,
         // });
-        console.log(state.status);
-        state.markersCar.push(addPoint(e.lnglat.getLng(), e.lnglat.getLat(), state.trafficIcos[state.status], 32, { name: state.traDesc[state.status].description }));
-        // nextTick(() => {
+        state.markersCar = addPoint(e.lnglat.getLng(), e.lnglat.getLat(), state.trafficIcos[state.status], state.map, 32, {
+          name: state.traDesc[state.status].description,
+          markerDialogVisible: false,
+        });
         state.map.setFitView();
         state.map.setZoom(13)
-        // })
 
       } else {
         this.$message({
@@ -144,51 +145,8 @@ function handleSelect (item) {
   state.markersBus.push(marker);
   state.map.setFitView();
 }
-//构建自定义信息窗体
-function createInfoWindow (title, content) {
-  var info = document.createElement("div");
-  info.className = "custom-info input-cards content-window-card";
 
-  //可以通过下面的方式修改自定义窗体的宽高
-  //info.style.width = "400px";
-  // 定义顶部标题
-  var top = document.createElement("div");
-  var titleD = document.createElement("div");
-  var closeX = document.createElement("img");
-  top.className = "info-top";
-  titleD.innerHTML = title;
-  closeX.src = "https://webapi.amap.com/images/close2.gif";
-  closeX.onclick = closeInfoWindow;
 
-  top.appendChild(titleD);
-  top.appendChild(closeX);
-  info.appendChild(top);
-
-  // 定义中部内容
-  var middle = document.createElement("div");
-  middle.className = "info-middle";
-  middle.style.backgroundColor = "white";
-  middle.innerHTML = content;
-  info.appendChild(middle);
-
-  // 定义底部内容
-  var bottom = document.createElement("div");
-  bottom.className = "info-bottom";
-  bottom.style.position = "relative";
-  bottom.style.top = "0px";
-  bottom.style.margin = "0 auto";
-  var sharp = document.createElement("img");
-  sharp.src = "https://webapi.amap.com/images/sharp.png";
-  bottom.appendChild(sharp);
-  info.appendChild(bottom);
-  return info;
-}
-function markerClick (e) {
-  console.log(e);
-  // let infoWindow = new AMap.InfoWindow({ offset: new AMap.Pixel(0, -30) });
-  state.infoWindow.setContent(e.target.content);
-  state.infoWindow.open(state.map, e.target.getPosition());
-}
 function closeInfoWindow () {
   state.map.clearInfoWindow();
 }
@@ -238,37 +196,96 @@ function querySearch (queryString, cb) {
 }
 /*公交站点查询返回数据解析*/
 function stationSearch_CallBack (searchResult) {
-  let stationArr = searchResult.stationInfo;
-  let searchNum = stationArr.length;
+
+  const stationArr = searchResult.stationInfo;
+  const searchNum = stationArr.length;
+
   if (searchNum > 0) {
-    state.infoWindow = new AMap.InfoWindow({ isCustom: true, offset: new AMap.Pixel(15, -30) });
+
+    console.log(stationArr);
+    //添加标记
     for (let i = 0; i < searchNum; i++) {
-      console.log(stationArr[i]);
-      var marker = new AMap.Marker({
-        icon: new AMap.Icon({
-          image: state.busImg,
-          size: new AMap.Size(32, 32),
-          imageSize: new AMap.Size(32, 32),
-        }),
-        // offset: new AMap.Pixel(-16, -32),
-        position: stationArr[i].location,
-        map: state.map,
-        title: stationArr[i].name,
-      });
-      //实例化信息窗体
-      let contents = [];
-      contents.push("<img src='http://tpc.googlesyndication.com/simgad/5843493769827749134'>地址：北京市朝阳区阜通东大街6号院3号楼东北8.3公里");
-      contents.push("电话：010-64733333");
+      let mapDialogContents = [];
+      mapDialogContents.push("<img src='http://tpc.googlesyndication.com/simgad/5843493769827749134'>地址：北京市朝阳区阜通东大街6号院3号楼东北8.3公里");
+      mapDialogContents.push("电话：010-64733333");
       // contents.push("<a href='https://ditu.amap.com/detail/B000A8URXB?citycode=110105'>详细信息</a>");
-      marker.content = createInfoWindow(stationArr[i].name, contents.join("<br/>"));
-      marker.on("mouseover", function (e) {
-        e.target.info.open(state.map, e.target.getPosition());
-      });
-      marker.on("click", markerClick);
-      marker.emit("click", { target: marker });
-      state.markersBus.push(marker);
+      state.markersBus.push(addPoint(stationArr[i].location.lng, stationArr[i].location.lat, state.busImg, state.map, 32, {
+        markerDialogVisible: true,
+        name: stationArr[i].name,
+        id: stationArr[i].id,
+        // markerClick: markerClick(),
+        contents: createInfoWindow(stationArr[i].name, mapDialogContents.join("<br/>"))
+      })
+      )
     }
+    // for (let i = 0; i < searchNum; i++) {
+    //   console.log(stationArr[i]);
+    //   var marker = new AMap.Marker({
+    //     icon: new AMap.Icon({
+    //       image: state.busImg,
+    //       size: new AMap.Size(32, 32),
+    //       imageSize: new AMap.Size(32, 32),
+    //     }),
+    //     // offset: new AMap.Pixel(-16, -32),
+    //     position: stationArr[i].location,
+    //     map: state.map,
+    //     title: stationArr[i].name,
+    //   });
+    //   //实例化信息窗体
+    //   let contents = [];
+    //   contents.push("<img src='http://tpc.googlesyndication.com/simgad/5843493769827749134'>地址：北京市朝阳区阜通东大街6号院3号楼东北8.3公里");
+    //   contents.push("电话：010-64733333");
+    //   // contents.push("<a href='https://ditu.amap.com/detail/B000A8URXB?citycode=110105'>详细信息</a>");
+    //   marker.content = createInfoWindow(stationArr[i].name, contents.join("<br/>"));
+    //   marker.on("mouseover", function (e) {
+    //     e.target.info.open(state.map, e.target.getPosition());
+    //   });
+    //   marker.on("click", markerClick);
+    //   marker.emit("click", { target: marker });
+    //   state.markersBus.push(marker);
+    // }
     state.map.setFitView();
   }
 }
+//构建自定义信息窗体
+function createInfoWindow (title, content) {
+  let info = document.createElement("div");
+  info.className = "custom-info input-cards content-window-card";
+
+  //可以通过下面的方式修改自定义窗体的宽高
+  //info.style.width = "400px";
+  // 定义顶部标题
+  let top = document.createElement("div");
+  let titleD = document.createElement("div");
+  let closeX = document.createElement("img");
+  top.className = "info-top";
+  titleD.innerHTML = title;
+  closeX.src = "https://webapi.amap.com/images/close2.gif";
+  closeX.onclick = closeInfoWindow;
+
+  top.appendChild(titleD);
+  top.appendChild(closeX);
+  info.appendChild(top);
+
+  // 定义中部内容
+  let middle = document.createElement("div");
+  middle.className = "info-middle";
+  middle.style.backgroundColor = "white";
+  middle.innerHTML = content;
+  info.appendChild(middle);
+
+  // 定义底部内容
+  let bottom = document.createElement("div");
+  bottom.className = "info-bottom";
+  bottom.style.position = "relative";
+  bottom.style.top = "0px";
+  bottom.style.margin = "0 auto";
+  let sharp = document.createElement("img");
+  sharp.src = "https://webapi.amap.com/images/sharp.png";
+  bottom.appendChild(sharp);
+  info.appendChild(bottom);
+  return info
+}
+
+
 export default { state }
